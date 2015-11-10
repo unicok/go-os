@@ -18,13 +18,15 @@ the interfaces are welcome.
 Each package provides a feature interface that will be pluggable and backed by a 
 number of services.
 
-- auth		|	authentication and authorisation for users and services	
-- config	|	dynamic configuration which is namespaced and versioned
-- db		|	distributed database abstraction
-- discovery	|	extends the go-micro registry to add heartbeating, etc
-- kv		|	simply key value layered on memcached, etcd, consul 
-- log		|	structured logging to stdout, logstash, fluentd, pubsub
-- monitor	|	add custom healthchecks measured with distributed systems in mind
-- metrics	|	instrumentation and collation of counters
-- router	|	global circuit breaking, load balancing, A/B testing
-- trace		|	distributed tracing of request/response
+Package     |   Features
+-------     |   ---------
+auth        |   authentication and authorisation for users and services	
+config      |   dynamic configuration which is namespaced and versioned
+db          |   distributed database abstraction
+discovery   |   extends the go-micro registry to add heartbeating, etc
+kv          |   simply key value layered on memcached, etcd, consul 
+log         |   structured logging to stdout, logstash, fluentd, pubsub
+monitor     |   add custom healthchecks measured with distributed systems in mind
+metrics     |   instrumentation and collation of counters
+router      |   global circuit breaking, load balancing, A/B testing
+trace       |   distributed tracing of request/response
