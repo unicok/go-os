@@ -14,6 +14,9 @@ much more powerful as a whole.
 The libraries here are not yet implemented. Discussion for 
 the interfaces are welcome.
 
+Note. Go-platform will include 1-3 supported implementations of each feature. 
+Further community wide features should be contributed to [go-plugins](https://godoc.org/github.com/myodc/go-plugins).
+
 ## Features
 Each package provides a feature interface that will be pluggable and backed by a 
 number of services.
