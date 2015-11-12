@@ -11,3 +11,8 @@ pain. Going lower level than this doesn't pose any value.
 
 Event sourcing can be tackled in a separate package.
 
+## Supported Databases
+
+- Cassandra
+- ?
+- ?
