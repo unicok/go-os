@@ -17,7 +17,7 @@ type Discovery interface {
 	Stop() error // stop heartbeating and clear cache
 }
 
-``
+```
 
 ## Supported Backends
 
