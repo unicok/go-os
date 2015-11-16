@@ -12,7 +12,7 @@ type Metrics interface {
 }
 ```
 
-## Supported Log stores
+## Supported Metric stores
 
 - Graphite
 - InfluxDB
