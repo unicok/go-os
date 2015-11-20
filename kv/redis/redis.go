@@ -1,7 +1,7 @@
 package redis
 
 import (
-	"github.com/myodc/go-platform/kv"
+	"github.com/micro/go-platform/kv"
 	redis "gopkg.in/redis.v3"
 )
 

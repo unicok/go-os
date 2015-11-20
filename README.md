@@ -1,4 +1,4 @@
-# Go Platform [![GoDoc](https://godoc.org/github.com/myodc/go-platform?status.svg)](https://godoc.org/github.com/myodc/go-platform) [![Travis CI](https://travis-ci.org/myodc/go-platform.svg?branch=master)](https://travis-ci.org/myodc/go-platform)
+# Go Platform [![GoDoc](https://godoc.org/github.com/micro/go-platform?status.svg)](https://godoc.org/github.com/micro/go-platform) [![Travis CI](https://travis-ci.org/micro/go-platform.svg?branch=master)](https://travis-ci.org/micro/go-platform)
 
 This is a microservice platform library built to be used with micro/go-micro. 
 It provides all of the fundamental tooling required to run and manage 
@@ -15,7 +15,7 @@ The libraries here are not yet implemented. Discussion for
 the interfaces are welcome.
 
 Note. Go-platform will include 1-3 supported implementations of each feature. 
-Further community wide features should be contributed to [go-plugins](https://github.com/myodc/go-plugins).
+Further community wide features should be contributed to [go-plugins](https://github.com/micro/go-plugins).
 
 ## Features
 Each package provides a feature interface that will be pluggable and backed by a 

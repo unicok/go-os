@@ -2,7 +2,7 @@ package memcached
 
 import (
 	mc "github.com/bradfitz/gomemcache/memcache"
-	"github.com/myodc/go-platform/kv"
+	"github.com/micro/go-platform/kv"
 )
 
 type mkv struct {
