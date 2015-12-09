@@ -13,7 +13,7 @@ cache.
 ```
 type Discovery interface {
 	micro.Registry()
-	Run() error // starts heartbeating and caching
+	Start() error // starts heartbeating and caching
 	Stop() error // stop heartbeating and clear cache
 }
 
