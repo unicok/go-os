@@ -1,7 +1,12 @@
 package discovery
 
 import (
+	"github.com/micro/go-micro/broker"
 	"github.com/micro/go-micro/registry"
+)
+
+const (
+	heartBeatTopic = "micro.discovery.heartbeat"
 )
 
 // Discovery builds on the registry as a mechanism
@@ -14,4 +19,15 @@ type Discovery interface {
 	Start() error
 	// stops the watcher, caching and hearbeating
 	Stop() error
+}
+
+type Options struct {
+	Registry registry.Registry
+	Broker   broker.Broker
+}
+
+type Option func(*Options)
+
+func NewDiscovery(opts ...Option) Discovery {
+	return newPlatform(opts...)
 }
