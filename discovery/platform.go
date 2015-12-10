@@ -1,7 +1,6 @@
 package discovery
 
 import (
-	"fmt"
 	"sync"
 
 	"github.com/micro/go-micro/broker"
@@ -31,7 +30,6 @@ func (p *platform) run() {
 				close(ch)
 				return
 			}
-			fmt.Printf("res %v %v\n", next.Action, next.Service)
 			ch <- next
 		}
 	}()
