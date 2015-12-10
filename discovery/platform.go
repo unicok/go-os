@@ -1,6 +1,7 @@
 package discovery
 
 import (
+	"fmt"
 	"sync"
 
 	"github.com/micro/go-micro/broker"
@@ -30,6 +31,7 @@ func (p *platform) run() {
 				close(ch)
 				return
 			}
+			fmt.Printf("res %v %v\n", next.Action, next.Service)
 			ch <- next
 		}
 	}()
@@ -51,17 +53,27 @@ func (p *platform) update(res *registry.Result) {
 	services, ok := p.cache[res.Service.Name]
 	if !ok {
 		// no service found, let's not go through a convoluted process
-		if res.Action == "create" || res.Action == "update" {
+		if (res.Action == "create" || res.Action == "update") && len(res.Service.Version) != 0 {
 			p.cache[res.Service.Name] = []*registry.Service{res.Service}
+		}
+		return
+	}
+
+	if len(res.Service.Nodes) == 0 {
+		switch res.Action {
+		case "delete":
+			delete(p.cache, res.Service.Name)
 		}
 		return
 	}
 
 	// existing service found
 	var service *registry.Service
-	for _, s := range services {
+	var index int
+	for i, s := range services {
 		if s.Version == res.Service.Version {
 			service = s
+			index = i
 		}
 	}
 
@@ -87,7 +99,8 @@ func (p *platform) update(res *registry.Result) {
 			}
 		}
 
-		service = res.Service
+		services[index] = res.Service
+		p.cache[res.Service.Name] = services
 	case "delete":
 		if service == nil {
 			return
@@ -109,8 +122,6 @@ func (p *platform) update(res *registry.Result) {
 			}
 		}
 
-		service.Nodes = nodes
-
 		if len(nodes) == 0 {
 			if len(services) == 1 {
 				delete(p.cache, service.Name)
@@ -123,7 +134,12 @@ func (p *platform) update(res *registry.Result) {
 				}
 				p.cache[service.Name] = srvs
 			}
+			return
 		}
+
+		service.Nodes = nodes
+		services[index] = service
+		p.cache[res.Service.Name] = services
 	}
 }
 
