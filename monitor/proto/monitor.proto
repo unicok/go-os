@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+
+message HealthCheck {
+	enum Status {
+		UNKNOWN = 0;
+		OK = 1;
+		ERROR = 2;
+	}
+
+	message Service {
+		string name = 1;
+		string version = 2;
+		string id = 3;
+	}
+
+	string id = 1; // "go.micro.health.check"
+	string description = 2; // "This is a health check for ..."
+	int64 timestamp = 3; // "unix timestamp"
+	Service service = 4;
+	Status status = 5;
+	map<string,string> results = 6;
+	string error = 7;
+}
