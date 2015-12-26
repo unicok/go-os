@@ -39,7 +39,7 @@ type Options struct {
 }
 
 var (
-	HealthCheckTopic = "go.micro.monitor.healthcheck"
+	HealthCheckTopic = "micro.monitor.healthcheck"
 )
 
 func NewMonitor(opts ...Option) Monitor {
