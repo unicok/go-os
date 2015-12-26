@@ -75,9 +75,11 @@ func (p *platform) update(h HealthChecker) {
 			Version: p.version,
 			Id:      p.id,
 		},
-		Status:  status,
-		Results: res,
-		Error:   errDesc,
+		Interval: int64(p.opts.Interval.Seconds()),
+		Ttl:      3600,
+		Status:   status,
+		Results:  res,
+		Error:    errDesc,
 	}
 
 	req := p.opts.Client.NewPublication(HealthCheckTopic, hcProto)

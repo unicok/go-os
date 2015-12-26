@@ -3,30 +3,30 @@ package main
 import (
 	"errors"
 	"fmt"
-	"time"
 	"github.com/micro/go-micro/cmd"
 	"github.com/micro/go-platform/monitor"
+	"time"
 )
 
 // Return successful healthcheck
 func success() (map[string]string, error) {
 	return map[string]string{
-		"msg": "a successful check",
-		"foo": "bar",
+		"msg":    "a successful check",
+		"foo":    "bar",
 		"metric": "1",
-		"label": "cruft",
-		"stats": "123.0",
+		"label":  "cruft",
+		"stats":  "123.0",
 	}, nil
 }
 
 // Return failing healthcheck
 func failure() (map[string]string, error) {
 	return map[string]string{
-		"msg": "a catastrophic failure occurred",
-		"foo": "ugh",
+		"msg":    "a catastrophic failure occurred",
+		"foo":    "ugh",
 		"metric": "-0.0001",
-		"label": "",
-		"stats": "NaN",
+		"label":  "",
+		"stats":  "NaN",
 	}, errors.New("Unknown exception")
 }
 

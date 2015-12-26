@@ -17,8 +17,10 @@ message HealthCheck {
 	string id = 1; // "go.micro.health.check"
 	string description = 2; // "This is a health check for ..."
 	int64 timestamp = 3; // "unix timestamp"
-	Service service = 4;
-	Status status = 5;
-	map<string,string> results = 6;
-	string error = 7;
+	int64 interval = 4;
+	int64 ttl = 5;
+	Service service = 6;
+	Status status = 7;
+	map<string,string> results = 8;
+	string error = 9;
 }
