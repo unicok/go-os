@@ -183,6 +183,10 @@ func (p *platform) Watch() (registry.Watcher, error) {
 	return p.opts.Registry.Watch()
 }
 
+func (p *platform) String() string {
+	return "platform"
+}
+
 func (p *platform) Start() error {
 	p.Lock()
 	defer p.Unlock()
