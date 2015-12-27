@@ -6,7 +6,6 @@ import (
 
 	"github.com/micro/go-micro/client"
 	"github.com/micro/go-micro/registry"
-	"github.com/micro/go-micro/server"
 
 	proto2 "github.com/micro/discovery-srv/proto/registry"
 	proto "github.com/micro/go-platform/discovery/proto"
@@ -14,9 +13,9 @@ import (
 )
 
 type platform struct {
-	opts  Options
-	exit  chan bool
-	watch registry.Watcher
+	opts    Options
+	exit    chan bool
+	watcher registry.Watcher
 
 	reg proto2.RegistryClient
 
@@ -30,7 +29,9 @@ type watcher struct {
 }
 
 func newPlatform(opts ...Option) Discovery {
-	var opt Options
+	opt := Options{
+		Discovery: true,
+	}
 
 	for _, o := range opts {
 		o(&opt)
@@ -42,10 +43,6 @@ func newPlatform(opts ...Option) Discovery {
 
 	if opt.Client == nil {
 		opt.Client = client.DefaultClient
-	}
-
-	if opt.Server == nil {
-		opt.Server = server.DefaultServer
 	}
 
 	if opt.Interval == time.Duration(0) {
@@ -95,16 +92,22 @@ func toValues(v []*proto.Value) []*registry.Value {
 func toProto(s *registry.Service) *proto.Service {
 	var endpoints []*proto.Endpoint
 	for _, ep := range s.Endpoints {
-		request := &proto.Value{
-			Name:   ep.Request.Name,
-			Type:   ep.Request.Type,
-			Values: values(ep.Request.Values),
+		var request, response *proto.Value
+
+		if ep.Request != nil {
+			request = &proto.Value{
+				Name:   ep.Request.Name,
+				Type:   ep.Request.Type,
+				Values: values(ep.Request.Values),
+			}
 		}
 
-		response := &proto.Value{
-			Name:   ep.Response.Name,
-			Type:   ep.Response.Type,
-			Values: values(ep.Response.Values),
+		if ep.Response != nil {
+			response = &proto.Value{
+				Name:   ep.Response.Name,
+				Type:   ep.Response.Type,
+				Values: values(ep.Response.Values),
+			}
 		}
 
 		endpoints = append(endpoints, &proto.Endpoint{
@@ -115,35 +118,45 @@ func toProto(s *registry.Service) *proto.Service {
 		})
 	}
 
+	var nodes []*proto.Node
+
+	for _, node := range s.Nodes {
+		nodes = append(nodes, &proto.Node{
+			Id:       node.Id,
+			Address:  node.Address,
+			Port:     int64(node.Port),
+			Metadata: node.Metadata,
+		})
+	}
+
 	return &proto.Service{
 		Name:      s.Name,
 		Version:   s.Version,
 		Metadata:  s.Metadata,
 		Endpoints: endpoints,
-		Nodes: []*proto.Node{
-			&proto.Node{
-				Id:       s.Nodes[0].Id,
-				Address:  s.Nodes[0].Address,
-				Port:     int64(s.Nodes[0].Port),
-				Metadata: s.Nodes[0].Metadata,
-			},
-		},
+		Nodes:     nodes,
 	}
 }
 
 func toService(s *proto.Service) *registry.Service {
 	var endpoints []*registry.Endpoint
 	for _, ep := range s.Endpoints {
-		request := &registry.Value{
-			Name:   ep.Request.Name,
-			Type:   ep.Request.Type,
-			Values: toValues(ep.Request.Values),
+		var request, response *registry.Value
+
+		if ep.Request != nil {
+			request = &registry.Value{
+				Name:   ep.Request.Name,
+				Type:   ep.Request.Type,
+				Values: toValues(ep.Request.Values),
+			}
 		}
 
-		response := &registry.Value{
-			Name:   ep.Response.Name,
-			Type:   ep.Response.Type,
-			Values: toValues(ep.Response.Values),
+		if ep.Response != nil {
+			response = &registry.Value{
+				Name:   ep.Response.Name,
+				Type:   ep.Response.Type,
+				Values: toValues(ep.Response.Values),
+			}
 		}
 
 		endpoints = append(endpoints, &registry.Endpoint{
@@ -180,8 +193,8 @@ func (w *watcher) Next() (*registry.Result, error) {
 	}
 
 	return &registry.Result{
-		Action:  r.Action,
-		Service: toService(r.Service),
+		Action:  r.Result.Action,
+		Service: toService(r.Result.Service),
 	}, nil
 }
 
@@ -189,47 +202,46 @@ func (w *watcher) Stop() {
 	w.wc.Close()
 }
 
-func (p *platform) heartbeat(hb *proto.Heartbeat) {
-	hb.Timestamp = time.Now().Unix()
-	pub := p.opts.Client.NewPublication(HeartbeatTopic, hb)
-	p.opts.Client.Publish(context.TODO(), pub)
+func (p *platform) heartbeat(t *time.Ticker) {
+	for _ = range t.C {
+		p.RLock()
+		for _, hb := range p.heartbeats {
+			hb.Timestamp = time.Now().Unix()
+			pub := p.opts.Client.NewPublication(HeartbeatTopic, hb)
+			p.opts.Client.Publish(context.TODO(), pub)
+		}
+		p.RUnlock()
+	}
+}
+
+func (p *platform) watch(ch chan *registry.Result) {
+	p.RLock()
+	watch := p.watcher
+	p.RUnlock()
+
+	for {
+		next, err := watch.Next()
+		if err != nil {
+			w, err := p.Watch()
+			if err != nil {
+				return
+			}
+			p.Lock()
+			p.watcher = w
+			p.Unlock()
+			watch = w
+			continue
+		}
+		ch <- next
+	}
 }
 
 func (p *platform) run() {
-	p.Lock()
-	watch := p.watch
-	p.Unlock()
-
 	ch := make(chan *registry.Result)
 	t := time.NewTicker(p.opts.Interval)
 
-	go func() {
-		for {
-			next, err := watch.Next()
-			if err != nil {
-				w, err := p.reg.Watch(context.TODO(), &proto2.WatchRequest{})
-				if err != nil {
-					return
-				}
-				p.Lock()
-				p.watch = &watcher{w}
-				watch = p.watch
-				p.Unlock()
-				continue
-			}
-			ch <- next
-		}
-	}()
-
-	go func() {
-		for _ = range t.C {
-			p.Lock()
-			for _, hb := range p.heartbeats {
-				go p.heartbeat(hb)
-			}
-			p.Unlock()
-		}
-	}()
+	go p.watch(ch)
+	go p.heartbeat(t)
 
 	for {
 		select {
@@ -351,6 +363,10 @@ func (p *platform) Register(s *registry.Service) error {
 	p.Lock()
 	defer p.Unlock()
 
+	if err := p.opts.Registry.Register(s); err != nil {
+		return err
+	}
+
 	service := toProto(s)
 
 	hb := &proto.Heartbeat{
@@ -363,8 +379,11 @@ func (p *platform) Register(s *registry.Service) error {
 	p.heartbeats[hb.Id] = hb
 
 	// now register
-	_, err := p.reg.Register(context.TODO(), &proto2.RegisterRequest{service})
-	return err
+	return client.Publish(context.TODO(), client.NewPublication(WatchTopic, &proto.Result{
+		Action:    "update",
+		Service:   service,
+		Timestamp: time.Now().Unix(),
+	}))
 }
 
 // TODO: publish event
@@ -372,11 +391,18 @@ func (p *platform) Deregister(s *registry.Service) error {
 	p.Lock()
 	defer p.Unlock()
 
+	if err := p.opts.Registry.Deregister(s); err != nil {
+		return err
+	}
+
 	delete(p.heartbeats, s.Nodes[0].Id)
 
-	// deregister
-	_, err := p.reg.Deregister(context.TODO(), &proto2.DeregisterRequest{toProto(s)})
-	return err
+	// now deregister
+	return client.Publish(context.TODO(), client.NewPublication(WatchTopic, &proto.Result{
+		Action:    "delete",
+		Service:   toProto(s),
+		Timestamp: time.Now().Unix(),
+	}))
 }
 
 func (p *platform) GetService(name string) ([]*registry.Service, error) {
@@ -386,6 +412,11 @@ func (p *platform) GetService(name string) ([]*registry.Service, error) {
 		return services, nil
 	}
 	p.RUnlock()
+
+	// disabled discovery?
+	if !p.opts.Discovery {
+		return p.opts.Registry.GetService(name)
+	}
 
 	rsp, err := p.reg.GetService(context.TODO(), &proto2.GetServiceRequest{Service: name})
 	if err != nil {
@@ -412,6 +443,11 @@ func (p *platform) ListServices() ([]*registry.Service, error) {
 	}
 	p.RUnlock()
 
+	// disabled discovery?
+	if !p.opts.Discovery {
+		return p.opts.Registry.ListServices()
+	}
+
 	rsp, err := p.reg.ListServices(context.TODO(), &proto2.ListServicesRequest{})
 	if err != nil {
 		return nil, err
@@ -426,6 +462,11 @@ func (p *platform) ListServices() ([]*registry.Service, error) {
 
 // TODO: subscribe to events rather than the registry itself?
 func (p *platform) Watch() (registry.Watcher, error) {
+	// disabled discovery?
+	if !p.opts.Discovery {
+		return p.opts.Registry.Watch()
+	}
+
 	wc, err := p.reg.Watch(context.TODO(), &proto2.WatchRequest{})
 	if err != nil {
 		return nil, err
@@ -440,12 +481,13 @@ func (p *platform) String() string {
 func (p *platform) Start() error {
 	p.Lock()
 	defer p.Unlock()
-	if p.watch == nil {
-		w, err := p.reg.Watch(context.TODO(), &proto2.WatchRequest{})
+
+	if p.watcher == nil {
+		w, err := p.Watch()
 		if err != nil {
 			return err
 		}
-		p.watch = &watcher{w}
+		p.watcher = w
 		p.exit = make(chan bool)
 		go p.run()
 	}
@@ -456,9 +498,9 @@ func (p *platform) Start() error {
 func (p *platform) Stop() error {
 	p.Lock()
 	defer p.Unlock()
-	if p.watch != nil {
-		p.watch.Stop()
-		p.watch = nil
+	if p.watcher != nil {
+		p.watcher.Stop()
+		p.watcher = nil
 		close(p.exit)
 	}
 	return nil

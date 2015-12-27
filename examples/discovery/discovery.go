@@ -56,7 +56,15 @@ func main() {
 	fmt.Println("Starting discovery, will sleep for 10 seconds")
 	d.Start()
 
-	<-time.After(time.Second * 20)
+	// find self
+	rsp, err := d.GetService("go.micro.srv.foo")
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Printf("Got service %+v\n", rsp[0])
+	}
+
+	<-time.After(time.Second * 10)
 
 	fmt.Println("Stopping discovery")
 	d.Stop()

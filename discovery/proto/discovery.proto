@@ -19,6 +19,7 @@ message Service {
 message Result {
 	string action = 1; // create, update, delete
 	Service service = 2;
+	int64 timestamp = 3; // unix timestamp
 }
 
 message Node {

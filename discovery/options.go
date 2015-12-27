@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/micro/go-micro/client"
-	"github.com/micro/go-micro/server"
+	"github.com/micro/go-micro/registry"
 )
 
 func Client(c client.Client) Option {
@@ -19,8 +19,14 @@ func Interval(i time.Duration) Option {
 	}
 }
 
-func Server(s server.Server) Option {
+func Registry(r registry.Registry) Option {
 	return func(o *Options) {
-		o.Server = s
+		o.Registry = r
+	}
+}
+
+func UseDiscovery(b bool) Option {
+	return func(o *Options) {
+		o.Discovery = b
 	}
 }
