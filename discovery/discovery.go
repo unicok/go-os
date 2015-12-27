@@ -1,12 +1,15 @@
 package discovery
 
 import (
-	"github.com/micro/go-micro/broker"
+	"time"
+
+	"github.com/micro/go-micro/client"
 	"github.com/micro/go-micro/registry"
+	"github.com/micro/go-micro/server"
 )
 
 const (
-	heartBeatTopic = "micro.discovery.heartbeat"
+	HeartbeatTopic = "micro.discovery.heartbeat"
 )
 
 // Discovery builds on the registry as a mechanism
@@ -23,7 +26,9 @@ type Discovery interface {
 
 type Options struct {
 	Registry registry.Registry
-	Broker   broker.Broker
+	Client   client.Client
+	Server   server.Server
+	Interval time.Duration
 }
 
 type Option func(*Options)
