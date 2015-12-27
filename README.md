@@ -26,7 +26,7 @@ Package     |   Features
 auth        |   authentication and authorisation for users and services	
 config      |   dynamic configuration which is namespaced and versioned
 db          |   distributed database abstraction
-discovery   |   extends the go-micro registry to add heartbeating, etc
+[discovery](https://godoc.org/github.com/micro/go-platform/discovery)   |   extends the go-micro registry to add heartbeating, etc
 kv          |   simply key value layered on memcached, etcd, consul 
 log         |   structured logging to stdout, logstash, fluentd, pubsub
 monitor     |   add custom healthchecks measured with distributed systems in mind
