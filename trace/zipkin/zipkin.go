@@ -120,8 +120,7 @@ func toThrift(s *trace.Span) *zipkincore.Span {
 
 func (z *zipkin) pub(s *zipkincore.Span, pr sarama.SyncProducer) {
 	t := thrift.NewTMemoryBufferLen(1024)
-	st := thrift.NewStreamTransportW(t)
-	p := thrift.NewTBinaryProtocolTransport(st)
+	p := thrift.NewTBinaryProtocolTransport(t)
 	if err := s.Write(p); err != nil {
 		return
 	}
