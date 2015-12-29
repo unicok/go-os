@@ -2,7 +2,6 @@ package zipkin
 
 import (
 	"encoding/binary"
-	"fmt"
 	"math/rand"
 	"net"
 	"strconv"
