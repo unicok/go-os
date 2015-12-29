@@ -84,6 +84,7 @@ func toProto(s *Span) *proto.Span {
 	}
 
 	return &proto.Span{
+		Name:        s.Name,
 		Id:          s.Id,
 		TraceId:     s.TraceId,
 		ParentId:    s.ParentId,
@@ -92,7 +93,6 @@ func toProto(s *Span) *proto.Span {
 		Debug:       s.Debug,
 		Source:      serviceToProto(s.Source),
 		Destination: serviceToProto(s.Destination),
-		Target:      s.Target,
 		Annotations: annotations,
 	}
 }

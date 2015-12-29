@@ -22,24 +22,24 @@ message Annotation {
 }
 
 message Span {
+	// name; topic, service method, etc
+	string name = 1;
 	// id of the span
-	string id = 1;
+	string id = 2;
 	// trace root id
-	string trace_id = 2;
+	string trace_id = 3;
 	// parent span id
-	string parent_id = 3;
+	string parent_id = 4;
 	// microseconds from epoch. start of span
-	int64 timestamp = 4;
+	int64 timestamp = 5;
 	// microseconds. duration of span
-	int64 duration = 5;
+	int64 duration = 6;
 	// should persist?
-	bool debug = 6;
+	bool debug = 7;
 	// source origin of the request
-	Service source = 7;
+	Service source = 8;
 	// destination of the request
-	Service destination = 8;
-	// Target topic of service method
-	string target = 9;
+	Service destination = 9;
 	// annotations
 	repeated Annotation annotations = 10;
 }

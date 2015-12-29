@@ -90,7 +90,7 @@ func toEndpoint(s *registry.Service) *zipkincore.Endpoint {
 func toThrift(s *trace.Span) *zipkincore.Span {
 	span := &zipkincore.Span{
 		TraceID:   toInt64(s.TraceId),
-		Name:      s.Target,
+		Name:      s.Name,
 		ID:        toInt64(s.Id),
 		ParentID:  thrift.Int64Ptr(toInt64(s.ParentId)),
 		Debug:     s.Debug,

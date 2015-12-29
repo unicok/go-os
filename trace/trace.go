@@ -43,6 +43,7 @@ type Trace interface {
 }
 
 type Span struct {
+	Name      string        // Topic / RPC Method
 	Id        string        // id of this span
 	TraceId   string        // The root trace id
 	ParentId  string        // Parent span id
@@ -52,7 +53,6 @@ type Span struct {
 
 	Source      *registry.Service // Originating service
 	Destination *registry.Service // Destination service
-	Target      string            // Topic / RPC Method
 
 	sync.Mutex
 	Annotations []*Annotation
