@@ -7,6 +7,7 @@ import (
 	c "github.com/micro/go-micro/context"
 	example "github.com/micro/go-micro/examples/server/proto/example"
 	"github.com/micro/go-platform/trace"
+	"github.com/micro/go-platform/trace/zipkin"
 	"golang.org/x/net/context"
 	"time"
 )
@@ -127,7 +128,9 @@ func pingPong(i int) {
 func main() {
 	cmd.Init()
 
-	t := trace.NewTrace()
+	t := zipkin.NewTrace(
+		trace.Collectors([]string{"192.168.99.100:9092"}),
+	)
 
 	client.DefaultClient = client.NewClient(
 		client.Wrap(
