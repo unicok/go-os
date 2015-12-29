@@ -107,9 +107,26 @@ func toThrift(s *trace.Span) *zipkincore.Span {
 				Host:           toEndpoint(a.Service),
 			})
 		} else {
+			var val string
+			switch a.Type {
+			case trace.AnnClientRequest:
+				val = zipkincore.CLIENT_SEND
+			case trace.AnnClientResponse:
+				val = zipkincore.CLIENT_RECV
+			case trace.AnnServerRequest:
+				val = zipkincore.SERVER_SEND
+			case trace.AnnServerResponse:
+				val = zipkincore.SERVER_RECV
+			default:
+				val = a.Key
+			}
+
+			if len(val) == 0 {
+				continue
+			}
 			span.Annotations = append(span.Annotations, &zipkincore.Annotation{
 				Timestamp: a.Timestamp.UnixNano() / 1e3,
-				Value:     a.Key,
+				Value:     val,
 				Host:      toEndpoint(a.Service),
 			})
 		}
