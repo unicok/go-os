@@ -18,9 +18,7 @@ import (
 )
 
 type zipkin struct {
-	opts trace.Options
-	p    sarama.SyncProducer
-
+	opts  trace.Options
 	spans chan *trace.Span
 
 	sync.Mutex
@@ -120,7 +118,7 @@ func toThrift(s *trace.Span) *zipkincore.Span {
 	return span
 }
 
-func (z *zipkin) pub(s *zipkincore.Span) {
+func (z *zipkin) pub(s *zipkincore.Span, pr sarama.SyncProducer) {
 	t := thrift.NewTMemoryBufferLen(1024)
 	st := thrift.NewStreamTransportW(t)
 	p := thrift.NewTBinaryProtocolTransport(st)
@@ -132,10 +130,10 @@ func (z *zipkin) pub(s *zipkincore.Span) {
 		Topic: z.opts.Topic,
 		Value: sarama.ByteEncoder(t.Buffer.Bytes()),
 	}
-	z.p.SendMessage(m)
+	pr.SendMessage(m)
 }
 
-func (z *zipkin) run(ch chan bool) {
+func (z *zipkin) run(ch chan bool, p sarama.SyncProducer) {
 	t := time.NewTicker(z.opts.BatchInterval)
 
 	var buf []*trace.Span
@@ -145,26 +143,27 @@ func (z *zipkin) run(ch chan bool) {
 		case s := <-z.spans:
 			buf = append(buf, s)
 			if len(buf) >= z.opts.BatchSize {
-				go z.send(buf)
+				go z.send(buf, p)
 				buf = nil
 			}
 		case <-t.C:
 			// flush
 			if len(buf) > 0 {
-				go z.send(buf)
+				go z.send(buf, p)
 				buf = nil
 			}
 		case <-ch:
 			// exit
 			t.Stop()
+			p.Close()
 			return
 		}
 	}
 }
 
-func (z *zipkin) send(b []*trace.Span) {
+func (z *zipkin) send(b []*trace.Span, p sarama.SyncProducer) {
 	for _, span := range b {
-		z.pub(toThrift(span))
+		z.pub(toThrift(span), p)
 	}
 }
 
@@ -248,10 +247,9 @@ func (z *zipkin) Start() error {
 	}
 
 	ch := make(chan bool)
-	go z.run(ch)
+	go z.run(ch, p)
 	z.exit = ch
 	z.running = true
-	z.p = p
 	return nil
 }
 
@@ -266,7 +264,7 @@ func (z *zipkin) Stop() error {
 	close(z.exit)
 	z.running = false
 	z.exit = nil
-	return z.p.Close()
+	return nil
 }
 
 func NewTrace(opts ...trace.Option) trace.Trace {
