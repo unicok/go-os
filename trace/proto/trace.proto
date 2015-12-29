@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+message Annotation {
+	enum Type {
+		UNKNOWN = 0;
+		START = 1;
+		TIMEOUT = 2;
+		CLIENT_REQUEST = 3;
+		CLIENT_RESPONSE = 4;
+		CLIENT_PUBLICATION = 5;
+		SERVER_REQUEST = 6;
+		SERVER_RESPONSE = 7;
+		SERVER_SUBSCRIPTION = 8;
+	}
+
+	int64 timestamp = 1;
+	Type type = 2;
+	string key = 3;
+	bytes value = 4;
+	map<string,string> debug = 5;
+	Service service = 6;
+}
+
+message Span {
+	// id of the span
+	string id = 1;
+	// trace root id
+	string trace_id = 2;
+	// parent span id
+	string parent_id = 3;
+	// microseconds from epoch. start of span
+	int64 timestamp = 4;
+	// microseconds. duration of span
+	int64 duration = 5;
+	// should persist?
+	bool debug = 6;
+	// source origin of the request
+	Service source = 7;
+	// destination of the request
+	Service destination = 8;
+	// Target topic of service method
+	string target = 9;
+	// annotations
+	repeated Annotation annotations = 10;
+}
+
+
+message Service {
+        string name = 1;
+        string version = 2;
+        map<string,string> metadata = 3;
+        repeated Node nodes = 4;
+}
+
+message Node {
+        string id = 1;
+        string address = 2;
+        int64 port = 3;
+        map<string,string> metadata = 4;
+}
