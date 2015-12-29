@@ -132,7 +132,7 @@ func (z *zipkin) pub(s *zipkincore.Span) {
 		Topic: z.opts.Topic,
 		Value: sarama.ByteEncoder(t.Buffer.Bytes()),
 	}
-	_, _, err := z.p.SendMessage(m)
+	z.p.SendMessage(m)
 }
 
 func (z *zipkin) run(ch chan bool) {
