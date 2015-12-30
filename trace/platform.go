@@ -6,12 +6,17 @@ import (
 	"time"
 
 	"github.com/micro/go-micro/client"
-	"github.com/micro/go-micro/context"
 	"github.com/micro/go-micro/registry"
 	proto "github.com/micro/go-platform/trace/proto"
 
 	"github.com/pborman/uuid"
-	ctx "golang.org/x/net/context"
+	"golang.org/x/net/context"
+)
+
+type contextKeyT string
+
+var (
+	contextKey = contextKeyT("github.com/micro/go-platform/trace")
 )
 
 type platform struct {
@@ -73,8 +78,12 @@ func toProto(s *Span) *proto.Span {
 	var annotations []*proto.Annotation
 
 	for _, a := range s.Annotations {
+		var timestamp int64
+		if !a.Timestamp.IsZero() {
+			timestamp = a.Timestamp.UnixNano() / 1e3
+		}
 		annotations = append(annotations, &proto.Annotation{
-			Timestamp: a.Timestamp.UnixNano() / 1e3,
+			Timestamp: timestamp,
 			Type:      proto.Annotation_Type(a.Type),
 			Key:       a.Key,
 			Value:     a.Value,
@@ -83,12 +92,17 @@ func toProto(s *Span) *proto.Span {
 		})
 	}
 
+	var timestamp int64
+	if !s.Timestamp.IsZero() {
+		timestamp = s.Timestamp.UnixNano() / 1e3
+	}
+
 	return &proto.Span{
 		Name:        s.Name,
 		Id:          s.Id,
 		TraceId:     s.TraceId,
 		ParentId:    s.ParentId,
-		Timestamp:   s.Timestamp.UnixNano() / 1e3,
+		Timestamp:   timestamp,
 		Duration:    s.Duration.Nanoseconds() / 1e3,
 		Debug:       s.Debug,
 		Source:      serviceToProto(s.Source),
@@ -100,7 +114,7 @@ func toProto(s *Span) *proto.Span {
 func (p *platform) send(buf []*Span) {
 	for _, s := range buf {
 		pub := p.opts.Client.NewPublication(p.opts.Topic, toProto(s))
-		p.opts.Client.Publish(ctx.TODO(), pub)
+		p.opts.Client.Publish(context.TODO(), pub)
 	}
 }
 
@@ -141,6 +155,7 @@ func (p *platform) Collect(s *Span) error {
 
 func (p *platform) NewSpan(s *Span) *Span {
 	if s == nil {
+		// completeley new trace
 		return &Span{
 			Id:        uuid.NewUUID().String(),
 			TraceId:   uuid.NewUUID().String(),
@@ -149,6 +164,8 @@ func (p *platform) NewSpan(s *Span) *Span {
 			Source:    p.opts.Service,
 		}
 	}
+
+	// existing trace in theory
 
 	if len(s.TraceId) == 0 {
 		s.TraceId = uuid.NewUUID().String()
@@ -160,22 +177,31 @@ func (p *platform) NewSpan(s *Span) *Span {
 		s.Id = uuid.NewUUID().String()
 	}
 
-	if s.Timestamp.IsZero() {
-		s.Timestamp = time.Now()
-	}
-
 	return &Span{
-		Id:        s.Id,
-		TraceId:   s.TraceId,
-		ParentId:  s.ParentId,
-		Timestamp: s.Timestamp,
+		Id:       s.Id,
+		TraceId:  s.TraceId,
+		ParentId: s.ParentId,
 	}
 }
 
-func (p *platform) FromMetadata(md context.Metadata) *Span {
+func (p *platform) FromContext(ctx context.Context) (*Span, bool) {
+	s, ok := ctx.Value(contextKey).(*Span)
+	return s, ok
+}
+
+func (p *platform) NewContext(ctx context.Context, s *Span) context.Context {
+	return context.WithValue(ctx, contextKey, s)
+}
+
+func (p *platform) FromHeader(md map[string]string) (*Span, bool) {
 	var debug bool
 	if md[DebugHeader] == "1" {
 		debug = true
+	}
+
+	// can we get span header and trace header?
+	if len(md[SpanHeader]) == 0 && len(md[TraceHeader]) == 0 {
+		return nil, false
 	}
 
 	return p.NewSpan(&Span{
@@ -183,22 +209,20 @@ func (p *platform) FromMetadata(md context.Metadata) *Span {
 		TraceId:  md[TraceHeader],
 		ParentId: md[ParentHeader],
 		Debug:    debug,
-	})
+	}), true
 }
 
-func (p *platform) ToMetadata(s *Span) context.Metadata {
+func (p *platform) NewHeader(md map[string]string, s *Span) map[string]string {
 	debug := "0"
 	if s.Debug {
 		debug = "1"
 	}
 
-	return context.Metadata{
-		SpanHeader:   s.Id,
-		TraceHeader:  s.TraceId,
-		ParentHeader: s.ParentId,
-		DebugHeader:  debug,
-	}
-	return nil
+	md[SpanHeader] = s.Id
+	md[TraceHeader] = s.TraceId
+	md[ParentHeader] = s.ParentId
+	md[DebugHeader] = debug
+	return md
 }
 
 func (p *platform) Start() error {

@@ -8,13 +8,20 @@ import (
 	"sync"
 	"time"
 
-	"github.com/micro/go-micro/context"
 	"github.com/micro/go-micro/registry"
 	"github.com/micro/go-platform/trace"
 	"github.com/micro/go-platform/trace/zipkin/thrift/gen-go/zipkincore"
 
 	"github.com/Shopify/sarama"
 	"github.com/apache/thrift/lib/go/thrift"
+
+	"golang.org/x/net/context"
+)
+
+type contextKeyT string
+
+var (
+	contextKey = contextKeyT("github.com/micro/go-platform/trace/zipkin")
 )
 
 type zipkin struct {
@@ -221,10 +228,24 @@ func (z *zipkin) NewSpan(s *trace.Span) *trace.Span {
 	}
 }
 
-func (z *zipkin) FromMetadata(md context.Metadata) *trace.Span {
+func (z *zipkin) FromContext(ctx context.Context) (*trace.Span, bool) {
+	s, ok := ctx.Value(contextKey).(*trace.Span)
+	return s, ok
+}
+
+func (z *zipkin) NewContext(ctx context.Context, s *trace.Span) context.Context {
+	return context.WithValue(ctx, contextKey, s)
+}
+
+func (z *zipkin) FromHeader(md map[string]string) (*trace.Span, bool) {
 	var debug bool
 	if md[SampleHeader] == "1" {
 		debug = true
+	}
+
+	// can we get span header and trace header?
+	if len(md[SpanHeader]) == 0 && len(md[TraceHeader]) == 0 {
+		return nil, false
 	}
 
 	return z.NewSpan(&trace.Span{
@@ -232,21 +253,19 @@ func (z *zipkin) FromMetadata(md context.Metadata) *trace.Span {
 		TraceId:  md[TraceHeader],
 		ParentId: md[ParentHeader],
 		Debug:    debug,
-	})
+	}), true
 }
 
-func (z *zipkin) ToMetadata(s *trace.Span) context.Metadata {
+func (z *zipkin) NewHeader(md map[string]string, s *trace.Span) map[string]string {
 	sample := "0"
 	if s.Debug {
 		sample = "1"
 	}
-
-	return context.Metadata{
-		SpanHeader:   s.Id,
-		TraceHeader:  s.TraceId,
-		ParentHeader: s.ParentId,
-		SampleHeader: sample,
-	}
+	md[SpanHeader] = s.Id
+	md[TraceHeader] = s.TraceId
+	md[ParentHeader] = s.ParentId
+	md[SampleHeader] = sample
+	return md
 }
 
 func (z *zipkin) Start() error {

@@ -5,23 +5,23 @@ import (
 	"time"
 
 	"github.com/micro/go-micro/client"
-	"github.com/micro/go-micro/context"
 	"github.com/micro/go-micro/registry"
 	"github.com/micro/go-micro/server"
 
-	//	"golang.org/x/net/context"
+	"golang.org/x/net/context"
 )
 
 const (
 	AnnUnknown            AnnotationType = 0
 	AnnStart              AnnotationType = 1
-	AnnTimeout            AnnotationType = 2
-	AnnClientRequest      AnnotationType = 3
-	AnnClientResponse     AnnotationType = 4
-	AnnClientPublication  AnnotationType = 5
-	AnnServerRequest      AnnotationType = 6
-	AnnServerResponse     AnnotationType = 7
-	AnnServerSubscription AnnotationType = 8
+	AnnEnd                AnnotationType = 2
+	AnnTimeout            AnnotationType = 3
+	AnnClientRequest      AnnotationType = 4
+	AnnClientResponse     AnnotationType = 5
+	AnnClientPublication  AnnotationType = 6
+	AnnServerRequest      AnnotationType = 7
+	AnnServerResponse     AnnotationType = 8
+	AnnServerSubscription AnnotationType = 9
 )
 
 type AnnotationType int32
@@ -30,10 +30,15 @@ type Trace interface {
 	// New span with certain fields preset.
 	// Provide parent span if you have it.
 	NewSpan(*Span) *Span
-	// Return a span from metadata
-	FromMetadata(md context.Metadata) *Span
-	// Turn span into metadata
-	ToMetadata(*Span) context.Metadata
+	// New context with span
+	NewContext(context.Context, *Span) context.Context
+	// Return a span from context
+	FromContext(context.Context) (*Span, bool)
+	// Span to Header
+	NewHeader(map[string]string, *Span) map[string]string
+	// Get span from header
+	FromHeader(map[string]string) (*Span, bool)
+
 	// Collect spans
 	Collect(*Span) error
 	// Start the collector
