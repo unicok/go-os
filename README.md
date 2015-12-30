@@ -29,7 +29,7 @@ db          |   distributed database abstraction
 [discovery](https://godoc.org/github.com/micro/go-platform/discovery)   |   extends the go-micro registry to add heartbeating, etc
 [kv](https://godoc.org/github.com/micro/go-platform/kv)          |   simply key value layered on memcached, etcd, consul 
 log         |   structured logging to stdout, logstash, fluentd, pubsub
-monitor     |   add custom healthchecks measured with distributed systems in mind
+[monitor](https://godoc.org/github.com/micro/go-platform/monitor)     |   add custom healthchecks measured with distributed systems in mind
 metrics     |   instrumentation and collation of counters
 router      |   global circuit breaking, load balancing, A/B testing
-trace       |   distributed tracing of request/response
+[trace](https://godoc.org/github.com/micro/go-platform/trace)       |   distributed tracing of request/response
