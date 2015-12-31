@@ -45,12 +45,12 @@ func newPlatform(opts ...Option) Monitor {
 		opt.Interval = time.Minute
 	}
 
-	c := opt.Server.Config()
+	c := opt.Server.Options()
 
 	return &platform{
-		name:    c.Name(),
-		version: c.Version(),
-		id:      c.Id(),
+		name:    c.Name,
+		version: c.Version,
+		id:      c.Id,
 		opts:    opt,
 		exit:    make(chan bool, 1),
 		hc:      make(map[string]HealthChecker),
