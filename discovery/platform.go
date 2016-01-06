@@ -187,7 +187,7 @@ func toService(s *proto.Service) *registry.Service {
 }
 
 func (w *watcher) Next() (*registry.Result, error) {
-	r, err := w.wc.RecvR()
+	r, err := w.wc.Recv()
 	if err != nil {
 		return nil, err
 	}
