@@ -12,13 +12,14 @@ type KV interface {
 }
 
 type Item struct {
-	Key   string
-	Value []byte
+	Key        string
+	Value      []byte
+	Expiration time.Duration
 }
 ```
 
 ## Supported KV Stores
 
+- Platform
 - Memcached
 - Redis
-- ?

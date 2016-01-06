@@ -11,14 +11,20 @@ Should also understand where there's massive failure and prevent deleting the
 cache.
 
 ```
+// Discovery builds on the registry as a mechanism
+// for finding services. It includes heartbeating
+// to notify of liveness and caching of the registry.
 type Discovery interface {
-	micro.Registry()
-	Start() error // starts heartbeating and caching
-	Stop() error // stop heartbeating and clear cache
+	// implements the registry interface
+	registry.Registry
+	// starts the watcher, caching and heartbeating
+	Start() error
+	// stops the watcher, caching and hearbeating
+	Stop() error
 }
-
 ```
 
 ## Supported Backends
 
-- micro registry (any plugins; consul, etcd, memory)
+- Micro registry (any plugins; consul, etcd, memory)
+- Platform
