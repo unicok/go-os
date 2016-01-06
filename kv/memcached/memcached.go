@@ -1,6 +1,8 @@
 package memcached
 
 import (
+	"time"
+
 	mc "github.com/bradfitz/gomemcache/memcache"
 	"github.com/micro/go-platform/kv"
 )
@@ -22,8 +24,9 @@ func (m *mkv) Get(key string) (*kv.Item, error) {
 	}
 
 	return &kv.Item{
-		Key:   keyval.Key,
-		Value: keyval.Value,
+		Key:        keyval.Key,
+		Value:      keyval.Value,
+		Expiration: time.Second * time.Duration(keyval.Expiration),
 	}, nil
 }
 
@@ -33,16 +36,23 @@ func (m *mkv) Del(key string) error {
 
 func (m *mkv) Put(item *kv.Item) error {
 	return m.Client.Set(&mc.Item{
-		Key:   item.Key,
-		Value: item.Value,
+		Key:        item.Key,
+		Value:      item.Value,
+		Expiration: int32(item.Expiration.Seconds()),
 	})
 }
 
-func NewKV(addrs []string) kv.KV {
-	if len(addrs) == 0 {
-		addrs = []string{"127.0.0.1:11211"}
+func NewKV(opts ...kv.Option) kv.KV {
+	var options kv.Options
+	for _, o := range opts {
+		o(&options)
 	}
+
+	if len(options.Servers) == 0 {
+		options.Servers = []string{"127.0.0.1:11211"}
+	}
+
 	return &mkv{
-		Client: mc.New(addrs...),
+		Client: mc.New(options.Servers...),
 	}
 }

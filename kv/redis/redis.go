@@ -22,9 +22,15 @@ func (r *rkv) Get(key string) (*kv.Item, error) {
 		return nil, kv.ErrNotFound
 	}
 
+	d, err := r.Client.TTL(key).Result()
+	if err != nil {
+		return nil, err
+	}
+
 	return &kv.Item{
-		Key:   key,
-		Value: val,
+		Key:        key,
+		Value:      val,
+		Expiration: d,
 	}, nil
 }
 
@@ -33,17 +39,22 @@ func (r *rkv) Del(key string) error {
 }
 
 func (r *rkv) Put(item *kv.Item) error {
-	return r.Client.Set(item.Key, item.Value, 0).Err()
+	return r.Client.Set(item.Key, item.Value, item.Expiration).Err()
 }
 
-func NewKV(addr string) kv.KV {
-	if len(addr) == 0 {
-		addr = "127.0.0.1:6379"
+func NewKV(opts ...kv.Option) kv.KV {
+	var options kv.Options
+	for _, o := range opts {
+		o(&options)
+	}
+
+	if len(options.Servers) == 0 {
+		options.Servers = []string{"127.0.0.1:6379"}
 	}
 
 	return &rkv{
 		Client: redis.NewClient(&redis.Options{
-			Addr:     addr,
+			Addr:     options.Servers[0],
 			Password: "", // no password set
 			DB:       0,  // use default DB
 		}),

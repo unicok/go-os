@@ -2,6 +2,7 @@ package kv
 
 import (
 	"errors"
+	"time"
 )
 
 var (
@@ -15,6 +16,10 @@ type KV interface {
 }
 
 type Item struct {
-	Key   string
-	Value []byte
+	Key        string
+	Value      []byte
+	Expiration time.Duration
 }
+
+type Option func(o *Options)
+
