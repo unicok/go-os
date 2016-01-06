@@ -25,7 +25,7 @@ func Registry(r registry.Registry) Option {
 	}
 }
 
-func UseDiscovery(b bool) Option {
+func EnableDiscovery(b bool) Option {
 	return func(o *Options) {
 		o.Discovery = b
 	}
