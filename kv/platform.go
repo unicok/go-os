@@ -137,7 +137,6 @@ func (p *platform) reap() {
 
 	// reap keys
 	mtx.Lock()
-	fmt.Printf("all the keys %+v\n", items)
 
 	for key, item := range items {
 		// Delta greater than expiration
