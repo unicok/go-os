@@ -13,6 +13,12 @@ type KV interface {
 	Get(key string) (*Item, error)
 	Del(key string) error
 	Put(item *Item) error
+
+	// Runtime. Could be used for internal reaping
+	// of expired keys or publishing info, gossip,
+	// etc
+	Start() error
+	Stop() error
 }
 
 type Item struct {
@@ -23,3 +29,6 @@ type Item struct {
 
 type Option func(o *Options)
 
+func NewKV(opts ...Option) KV {
+	return newPlatform(opts...)
+}
