@@ -42,6 +42,14 @@ func (m *mkv) Put(item *kv.Item) error {
 	})
 }
 
+func (m *mkv) Start() error {
+	return nil
+}
+
+func (m *mkv) Stop() error {
+	return nil
+}
+
 func NewKV(opts ...kv.Option) kv.KV {
 	var options kv.Options
 	for _, o := range opts {

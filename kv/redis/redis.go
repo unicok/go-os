@@ -42,6 +42,14 @@ func (r *rkv) Put(item *kv.Item) error {
 	return r.Client.Set(item.Key, item.Value, item.Expiration).Err()
 }
 
+func (r *rkv) Start() error {
+	return nil
+}
+
+func (r *rkv) Stop() error {
+	return nil
+}
+
 func NewKV(opts ...kv.Option) kv.KV {
 	var options kv.Options
 	for _, o := range opts {
