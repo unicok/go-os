@@ -3,8 +3,8 @@ package file
 import (
 	"sync"
 
-	"gopkg.in/fsnotify.v1"
 	"github.com/micro/go-platform/config"
+	"gopkg.in/fsnotify.v1"
 )
 
 type watcher struct {
@@ -15,8 +15,8 @@ type watcher struct {
 }
 
 type watch struct {
-	fw *fsnotify.Watcher
-	ch chan *config.ChangeSet
+	fw   *fsnotify.Watcher
+	ch   chan *config.ChangeSet
 	exit chan bool
 }
 
@@ -24,13 +24,13 @@ func (w *watcher) Changes() <-chan *config.ChangeSet {
 	w.Lock()
 	defer w.Unlock()
 
-	// do something about this. Maybe create the watcher 
+	// do something about this. Maybe create the watcher
 	// before hand
 	fw, _ := fsnotify.NewWatcher()
 
 	aw := &watch{
-		fw: fw,
-		ch: make(chan *config.ChangeSet),
+		fw:   fw,
+		ch:   make(chan *config.ChangeSet),
 		exit: make(chan bool),
 	}
 

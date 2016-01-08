@@ -35,10 +35,10 @@ func (f *file) Read() (*config.ChangeSet, error) {
 	checksum := fmt.Sprintf("%x", h.Sum(nil))
 
 	return &config.ChangeSet{
-		Source: f.String(),
+		Source:    f.String(),
 		Timestamp: info.ModTime(),
-		Data: b,
-		Checksum: checksum,
+		Data:      b,
+		Checksum:  checksum,
 	}, nil
 }
 
