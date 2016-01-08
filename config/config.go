@@ -25,9 +25,11 @@ type Config interface {
 // This may be a file, a url, consul, etc.
 type Source interface {
 	// Loads ChangeSet from the source
-	Read() (ChangeSet, error)
+	Read() (*ChangeSet, error)
 	// Watch for changes
-	Watch() Watcher
+	Watch() (Watcher, error)
+	// Name of source
+	String() string
 }
 
 // Values loaded within the config
@@ -51,15 +53,15 @@ type Value interface {
 }
 
 // ChangeSet represents a set an actual source
-type ChangeSet interface {
+type ChangeSet struct {
 	// The time at which the last change occured
-	Timestamp() time.Time
+	Timestamp time.Time
 	// The raw data set for the change
-	Data() []byte
+	Data []byte
 	// Hash of the source data
-	Checksum() string
+	Checksum string
 	// The source of this change
-	String() string
+	Source string
 }
 
 // The watcher notifies of changes at a granular level.
@@ -68,7 +70,7 @@ type ChangeSet interface {
 // are closed and the watcher is rendered unusable.
 type Watcher interface {
 	// Retrieve a watcher on the source
-	Changes() chan ChangeSet
+	Changes() <-chan *ChangeSet
 	// Stop all channels
 	Stop() error
 }
@@ -84,3 +86,5 @@ type Validator interface {}
 */
 
 type Option func(o *Options)
+
+type SourceOption func(o *SourceOptions)

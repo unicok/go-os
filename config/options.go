@@ -9,6 +9,11 @@ type Options struct {
 	Sources      []Source
 }
 
+type SourceOptions struct {
+	// Name, Url, etc
+	Name string
+}
+
 // PollInterval is the time interval at which the sources are polled
 // to retrieve config.
 func PollInterval(i time.Duration) Option {
@@ -25,3 +30,12 @@ func WithSource(s Source) Option {
 		o.Sources = append(o.Sources, s)
 	}
 }
+
+// Source options
+
+func SourceName(n string) SourceOption {
+	return func(o *SourceOptions) {
+		o.Name = n
+	}
+}
+
