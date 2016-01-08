@@ -48,7 +48,7 @@ type Value interface {
 	Duration(def string) time.Duration
 	StringSlice() []string
 	StringMap() map[string]string
-	Struct(val interface{}) error
+	Scan(val interface{}) error
 	Bytes() []byte
 }
 
