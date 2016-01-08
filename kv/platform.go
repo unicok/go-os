@@ -71,10 +71,16 @@ func newPlatform(opts ...Option) KV {
 	}
 
 	options.Server.Subscribe(
-		options.Server.NewSubscriber(GossipTopic, p.subscriber),
+		options.Server.NewSubscriber(
+			GossipTopic, p.subscriber, server.InternalSubscriber(true),
+		),
 	)
 
-	proto.RegisterKVHandler(options.Server, new(kv))
+	options.Server.Handle(
+		options.Server.NewHandler(
+			&proto.KV{new(kv)}, server.InternalHandler(true),
+		),
+	)
 
 	return p
 }
