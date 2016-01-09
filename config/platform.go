@@ -157,7 +157,7 @@ func (p *platform) Start() error {
 
 	p.running = true
 	p.exit = make(chan bool)
-	p.run(p.exit)
+	go p.run(p.exit)
 	return nil
 }
 
