@@ -80,9 +80,9 @@ func (j *jsonValue) StringMap(def map[string]string) map[string]string {
 
 func (j *jsonValue) Scan(v interface{}) error {
 	b, err := j.Json.Bytes()
-        if err != nil {
+	if err != nil {
 		return err
-        }
+	}
 	return json.Unmarshal(b, v)
 }
 

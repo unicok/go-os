@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"time"
 
-	hash "github.com/mitchellh/hashstructure"
 	"github.com/imdario/mergo"
+	hash "github.com/mitchellh/hashstructure"
 )
 
-type jsonReader struct {}
+type jsonReader struct{}
 
 func (j *jsonReader) Parse(changes ...*ChangeSet) (*ChangeSet, error) {
 	var merged map[string]interface{}
@@ -36,9 +36,9 @@ func (j *jsonReader) Parse(changes ...*ChangeSet) (*ChangeSet, error) {
 
 	return &ChangeSet{
 		Timestamp: time.Now(),
-		Data: b,
-		Checksum: fmt.Sprintf("%x", h),
-		Source: "json",
+		Data:      b,
+		Checksum:  fmt.Sprintf("%x", h),
+		Source:    "json",
 	}, nil
 }
 

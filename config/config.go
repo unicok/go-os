@@ -48,7 +48,7 @@ type Source interface {
 	String() string
 }
 
-// Reader takes a ChangeSet from a source and returns a single 
+// Reader takes a ChangeSet from a source and returns a single
 // merged ChangeSet e.g reads ChangeSet as JSON and can merge down
 type Reader interface {
 	// Parse ChangeSets
