@@ -6,6 +6,7 @@ import (
 
 type Options struct {
 	PollInterval time.Duration
+	Reader       Reader
 	Sources      []Source
 }
 
@@ -31,8 +32,19 @@ func WithSource(s Source) Option {
 	}
 }
 
+// WithReader is the reader used by config to parse
+// ChangeSets, merge them and provide values.
+// We're not as elegant here in terms of encoding.
+func WithReader(r Reader) Option {
+	return func(o *Options) {
+		o.Reader = r
+	}
+}
+
 // Source options
 
+// SourceName is an option to provide name of a file,
+// a url, key within etcd, consul, zookeeper, etc.
 func SourceName(n string) SourceOption {
 	return func(o *SourceOptions) {
 		o.Name = n

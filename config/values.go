@@ -26,6 +26,13 @@ func newValues(ch *ChangeSet) (Values, error) {
 	return &jsonValues{ch, sj}, nil
 }
 
+func newValue(s *simple.Json) Value {
+	if s == nil {
+		s = simple.New()
+	}
+	return &jsonValue{s}
+}
+
 func (j *jsonValues) Get(path ...string) Value {
 	return &jsonValue{j.sj.GetPath(path...)}
 }

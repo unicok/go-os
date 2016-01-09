@@ -16,7 +16,7 @@ type Config interface {
 	Start() error
 	Stop() error
 	// String name of config; platform
-	String()
+	String() string
 }
 
 // Values loaded within the config
@@ -74,3 +74,11 @@ type ChangeSet struct {
 type Option func(o *Options)
 
 type SourceOption func(o *SourceOptions)
+
+var (
+	DefaultPollInterval = time.Second * 30
+)
+
+func NewConfig(opts ...Option) Config {
+	return newPlatform(opts...)
+}
