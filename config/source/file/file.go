@@ -14,6 +14,10 @@ type file struct {
 	opts config.SourceOptions
 }
 
+var (
+	DefaultFileName = "config.values"
+)
+
 func (f *file) Read() (*config.ChangeSet, error) {
 	fh, err := os.Open(f.opts.Name)
 	if err != nil {
@@ -54,7 +58,9 @@ func (f *file) Watch() (config.Watcher, error) {
 }
 
 func NewSource(opts ...config.SourceOption) config.Source {
-	var options config.SourceOptions
+	options := config.SourceOptions{
+		Name: DefaultFileName,
+	}
 	for _, o := range opts {
 		o(&options)
 	}
