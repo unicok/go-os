@@ -8,28 +8,17 @@ import (
 // number of sources and provides a single merged
 // interface.
 type Config interface {
-	// Loads config from sources
+	// Load the values from sources and parse
 	Load() error
 	// Config values
 	Values
-	// Combined source
-	Source
-	// Options for the config
+	// Config options
 	Options() Options
 	// Start/Stop for internal interval updater, etc.
 	Start() error
 	Stop() error
-}
-
-// Source is the source from which config is loaded.
-// This may be a file, a url, consul, etc.
-type Source interface {
-	// Loads ChangeSet from the source
-	Read() (*ChangeSet, error)
-	// Watch for changes
-	Watch() (Watcher, error)
-	// Name of source
-	String() string
+	// String name of config; platform
+	String()
 }
 
 // Values loaded within the config
@@ -52,6 +41,24 @@ type Value interface {
 	Bytes() []byte
 }
 
+// Source is the source from which config is loaded.
+// This may be a file, a url, consul, etc.
+type Source interface {
+	// Loads ChangeSet from the source
+	Read() (*ChangeSet, error)
+	// Name of source
+	String() string
+}
+
+// Parser takes a changeset from a source and returns Values.
+// E.g reads ChangeSet as JSON and can merge down
+type Parser interface {
+	// Parse ChangeSets
+	Parse(...*ChangeSet) (Values, error)
+	// Name of parser; json
+	String() string
+}
+
 // ChangeSet represents a set an actual source
 type ChangeSet struct {
 	// The time at which the last change occured
@@ -60,30 +67,9 @@ type ChangeSet struct {
 	Data []byte
 	// Hash of the source data
 	Checksum string
-	// The source of this change
+	// The source of this change; file, consul, etcd
 	Source string
 }
-
-// The watcher notifies of changes at a granular level.
-// Changes() can be called multiple times to retrieve
-// new channels. When Stop() is called, all channels
-// are closed and the watcher is rendered unusable.
-type Watcher interface {
-	// Retrieve a watcher on the source
-	Changes() <-chan *ChangeSet
-	// Stop all channels
-	Stop() error
-}
-
-/*
-
-Scoped config by labels, environment, datacenter, etc
-type Context interface {}
-
-Validate loaded properties
-type Validator interface {}
-
-*/
 
 type Option func(o *Options)
 

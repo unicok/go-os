@@ -38,4 +38,3 @@ func SourceName(n string) SourceOption {
 		o.Name = n
 	}
 }
-
