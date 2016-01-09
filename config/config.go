@@ -8,8 +8,6 @@ import (
 // number of sources and provides a single merged
 // interface.
 type Config interface {
-	// Load the values from sources and parse
-	Load() error
 	// Config values
 	Values
 	// Config options
@@ -30,13 +28,13 @@ type Values interface {
 
 // Represent a value retrieved from the values loaded
 type Value interface {
-	Bool() bool
+	Bool(def bool) bool
 	Int(def int) int
 	String(def string) string
 	Float64(def float64) float64
-	Duration(def string) time.Duration
-	StringSlice() []string
-	StringMap() map[string]string
+	Duration(def time.Duration) time.Duration
+	StringSlice(def []string) []string
+	StringMap(def map[string]string) map[string]string
 	Scan(val interface{}) error
 	Bytes() []byte
 }
@@ -50,11 +48,13 @@ type Source interface {
 	String() string
 }
 
-// Parser takes a changeset from a source and returns Values.
-// E.g reads ChangeSet as JSON and can merge down
-type Parser interface {
+// Reader takes a ChangeSet from a source and returns a single 
+// merged ChangeSet e.g reads ChangeSet as JSON and can merge down
+type Reader interface {
 	// Parse ChangeSets
-	Parse(...*ChangeSet) (Values, error)
+	Parse(...*ChangeSet) (*ChangeSet, error)
+	// As values
+	Values(*ChangeSet) (Values, error)
 	// Name of parser; json
 	String() string
 }
