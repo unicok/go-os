@@ -27,10 +27,10 @@ func (s *source) Read() (*ChangeSet, error) {
 		return nil, err
 	}
 	return &ChangeSet{
-		Timestamp: time.Unix(rsp.Change.Set.Timestamp, 0),
-		Data:      []byte(rsp.Change.Set.Data),
-		Checksum:  rsp.Change.Set.Checksum,
-		Source:    rsp.Change.Set.Source,
+		Timestamp: time.Unix(rsp.Change.ChangeSet.Timestamp, 0),
+		Data:      []byte(rsp.Change.ChangeSet.Data),
+		Checksum:  rsp.Change.ChangeSet.Checksum,
+		Source:    rsp.Change.ChangeSet.Source,
 	}, nil
 }
 
