@@ -2,17 +2,23 @@ package config
 
 import (
 	"time"
+
+	"github.com/micro/go-micro/client"
 )
 
 type Options struct {
 	PollInterval time.Duration
 	Reader       Reader
 	Sources      []Source
+	Client       client.Client
 }
 
 type SourceOptions struct {
 	// Name, Url, etc
 	Name string
+
+	// Client for platform
+	Client client.Client
 }
 
 // PollInterval is the time interval at which the sources are polled
@@ -32,6 +38,12 @@ func WithSource(s Source) Option {
 	}
 }
 
+func WithClient(c client.Client) Option {
+	return func(o *Options) {
+		o.Client = c
+	}
+}
+
 // WithReader is the reader used by config to parse
 // ChangeSets, merge them and provide values.
 // We're not as elegant here in terms of encoding.
@@ -48,5 +60,11 @@ func WithReader(r Reader) Option {
 func SourceName(n string) SourceOption {
 	return func(o *SourceOptions) {
 		o.Name = n
+	}
+}
+
+func SourceClient(c client.Client) SourceOption {
+	return func(o *SourceOptions) {
+		o.Client = c
 	}
 }

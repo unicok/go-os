@@ -74,4 +74,16 @@ func TestReader(t *testing.T) {
 	if res := v.Get("c", "d").String(""); res != "f" {
 		t.Errorf("Expected %s got %s", "f", res)
 	}
+
+	// Try set things
+	v.Set("a thing", "path", "to", "key")
+	if res := v.Get("path", "to", "key").String(""); res != "a thing" {
+		t.Errorf("Expected %s got %s", "a thing", res)
+	}
+
+	// Try del things
+	v.Del("path", "to", "key")
+	if res := v.Get("path", "to", "key").String("default"); res != "default" {
+		t.Errorf("Expected %s got %s", "default", res)
+	}
 }

@@ -5,6 +5,7 @@ import (
 	"time"
 
 	log "github.com/golang/glog"
+	"github.com/micro/go-micro/client"
 )
 
 type platform struct {
@@ -26,6 +27,15 @@ func newPlatform(opts ...Option) Config {
 
 	for _, o := range opts {
 		o(&options)
+	}
+
+	if options.Client == nil {
+		options.Client = client.DefaultClient
+	}
+
+	if options.Sources == nil {
+		// Set a platform source
+		options.Sources = append(options.Sources, NewSource(SourceClient(options.Client)))
 	}
 
 	return &platform{
@@ -142,6 +152,47 @@ func (p *platform) Get(path ...string) Value {
 
 	// ok we're going hardcore now
 	return newValue(nil)
+}
+
+func (p *platform) Del(path ...string) {
+	if !p.loaded() {
+		p.sync()
+	}
+
+	p.Lock()
+	defer p.Unlock()
+
+	if p.vals != nil {
+		p.vals.Del(path...)
+	}
+}
+
+func (p *platform) Set(val interface{}, path ...string) {
+	if !p.loaded() {
+		p.sync()
+	}
+
+	p.Lock()
+	defer p.Unlock()
+
+	if p.vals != nil {
+		p.vals.Set(val, path...)
+	}
+}
+
+func (p *platform) Bytes() []byte {
+	if !p.loaded() {
+		p.sync()
+	}
+
+	p.Lock()
+	defer p.Unlock()
+
+	if p.vals == nil {
+		return []byte{}
+	}
+
+	return p.vals.Bytes()
 }
 
 func (p *platform) Options() Options {

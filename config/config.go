@@ -23,7 +23,14 @@ type Config interface {
 type Values interface {
 	// The path could be a nested structure so
 	// make it a composable.
+	// Returns internal cached value
 	Get(path ...string) Value
+	// Sets internal cached value
+	Set(val interface{}, path ...string)
+	// Deletes internal cached value
+	Del(path ...string)
+	// Returns vals as bytes
+	Bytes() []byte
 }
 
 // Represent a value retrieved from the values loaded

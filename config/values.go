@@ -18,7 +18,7 @@ type jsonValue struct {
 }
 
 func newValues(ch *ChangeSet) (Values, error) {
-	sj := new(simple.Json)
+	sj := simple.New()
 	err := sj.UnmarshalJSON(ch.Data)
 	if err != nil {
 		return nil, err
@@ -35,6 +35,33 @@ func newValue(s *simple.Json) Value {
 
 func (j *jsonValues) Get(path ...string) Value {
 	return &jsonValue{j.sj.GetPath(path...)}
+}
+
+func (j *jsonValues) Del(path ...string) {
+	// delete the tree?
+	if len(path) == 0 {
+		j.sj = simple.New()
+		return
+	}
+
+	if len(path) == 1 {
+		j.sj.Del(path[0])
+		return
+	}
+
+	vals := j.sj.GetPath(path[:len(path)-1]...)
+	vals.Del(path[len(path)-1])
+	j.sj.SetPath(path[:len(path)-1], vals.Interface())
+	return
+}
+
+func (j *jsonValues) Set(val interface{}, path ...string) {
+	j.sj.SetPath(path, val)
+}
+
+func (j *jsonValues) Bytes() []byte {
+	b, _ := j.sj.MarshalJSON()
+	return b
 }
 
 func (j *jsonValue) Bool(def bool) bool {
@@ -86,7 +113,7 @@ func (j *jsonValue) StringMap(def map[string]string) map[string]string {
 }
 
 func (j *jsonValue) Scan(v interface{}) error {
-	b, err := j.Json.Bytes()
+	b, err := j.Json.MarshalJSON()
 	if err != nil {
 		return err
 	}

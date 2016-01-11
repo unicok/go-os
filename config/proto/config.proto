@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+message ChangeSet {
+	int64 timestamp = 1;
+	string data = 2;
+	string checksum = 3;
+	string source = 4;
+}
