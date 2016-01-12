@@ -50,7 +50,7 @@ func (f *file) String() string {
 	return "file"
 }
 
-func (f *file) Watch() (config.Watcher, error) {
+func (f *file) Watch() (config.SourceWatcher, error) {
 	if _, err := os.Stat(f.opts.Name); err != nil {
 		return nil, err
 	}

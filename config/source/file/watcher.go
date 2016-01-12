@@ -14,7 +14,7 @@ type watcher struct {
 	exit chan bool
 }
 
-func newWatcher(f *file) (config.Watcher, error) {
+func newWatcher(f *file) (config.SourceWatcher, error) {
 	fw, err := fsnotify.NewWatcher()
 	if err != nil {
 		return nil, err
