@@ -3,9 +3,8 @@ package config
 import (
 	"time"
 
-	"github.com/micro/go-micro/client"
-
 	proto "github.com/micro/config-srv/proto/config"
+	"github.com/micro/go-micro/client"
 	"golang.org/x/net/context"
 )
 
@@ -14,10 +13,6 @@ type source struct {
 
 	client proto.ConfigClient
 }
-
-var (
-	DefaultSourceName = "CONFIG"
-)
 
 func (s *source) Read() (*ChangeSet, error) {
 	rsp, err := s.client.Read(context.TODO(), &proto.ReadRequest{
@@ -36,6 +31,16 @@ func (s *source) Read() (*ChangeSet, error) {
 
 func (s *source) String() string {
 	return "platform"
+}
+
+func (s *source) Watch() (SourceWatcher, error) {
+	stream, err := s.client.Watch(context.TODO(), &proto.WatchRequest{
+		Id: s.opts.Name,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &watcher{stream}, nil
 }
 
 func NewSource(opts ...SourceOption) Source {

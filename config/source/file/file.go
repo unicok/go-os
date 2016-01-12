@@ -50,14 +50,12 @@ func (f *file) String() string {
 	return "file"
 }
 
-/*
 func (f *file) Watch() (config.Watcher, error) {
 	if _, err := os.Stat(f.opts.Name); err != nil {
 		return nil, err
 	}
-	return &watcher{f: f}, nil
+	return newWatcher(f)
 }
-*/
 
 func NewSource(opts ...config.SourceOption) config.Source {
 	options := config.SourceOptions{

@@ -1,7 +1,7 @@
 package file
 
 import (
-	"sync"
+	"errors"
 
 	"github.com/micro/go-platform/config"
 	"gopkg.in/fsnotify.v1"
@@ -10,72 +10,48 @@ import (
 type watcher struct {
 	f *file
 
-	sync.Mutex
-	watchers []*watch
-}
-
-type watch struct {
 	fw   *fsnotify.Watcher
-	ch   chan *config.ChangeSet
 	exit chan bool
 }
 
-func (w *watcher) Changes() <-chan *config.ChangeSet {
-	w.Lock()
-	defer w.Unlock()
-
-	// do something about this. Maybe create the watcher
-	// before hand
-	fw, _ := fsnotify.NewWatcher()
-
-	aw := &watch{
-		fw:   fw,
-		ch:   make(chan *config.ChangeSet),
-		exit: make(chan bool),
+func newWatcher(f *file) (config.Watcher, error) {
+	fw, err := fsnotify.NewWatcher()
+	if err != nil {
+		return nil, err
 	}
 
-	aw.fw.Add(w.f.opts.Name)
+	fw.Add(f.opts.Name)
 
-	go func() {
-		// cleanup func
-		defer func() {
-			aw.fw.Close()
-			close(aw.ch)
-		}()
+	return &watcher{
+		f:    f,
+		fw:   fw,
+		exit: make(chan bool),
+	}, nil
+}
 
-		for {
-			select {
-			case <-aw.fw.Events:
-				c, err := w.f.Read()
-				if err != nil {
-					return
-				}
-				// send changeset
-				aw.ch <- c
-			case <-aw.fw.Errors:
-				// exit on err
-				return
-			case <-aw.exit:
-				// told to exit
-				return
-			}
+func (w *watcher) Next() (*config.ChangeSet, error) {
+	// is it closed?
+	select {
+	case <-w.exit:
+		return nil, errors.New("watcher stopped")
+	default:
+	}
+
+	// try get the event
+	select {
+	case <-w.fw.Events:
+		c, err := w.f.Read()
+		if err != nil {
+			return nil, err
 		}
-	}()
-
-	w.watchers = append(w.watchers, aw)
-
-	return aw.ch
+		return c, nil
+	case err := <-w.fw.Errors:
+		return nil, err
+	case <-w.exit:
+		return nil, errors.New("watcher stopped")
+	}
 }
 
 func (w *watcher) Stop() error {
-	w.Lock()
-	defer w.Unlock()
-
-	for _, w := range w.watchers {
-		close(w.exit)
-	}
-
-	w.watchers = nil
-
-	return nil
+	return w.fw.Close()
 }

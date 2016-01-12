@@ -51,8 +51,19 @@ type Value interface {
 type Source interface {
 	// Loads ChangeSet from the source
 	Read() (*ChangeSet, error)
+	// Watch for source changes
+	// Returns the entire changeset
+	Watch() (SourceWatcher, error)
 	// Name of source
 	String() string
+}
+
+// SourceWatcher allows you to watch a source for changes
+// Next is a blocking call which returns the next
+// ChangeSet update. Stop Renders the watcher unusable.
+type SourceWatcher interface {
+	Next() (*ChangeSet, error)
+	Stop() error
 }
 
 // Reader takes a ChangeSet from a source and returns a single
@@ -84,6 +95,7 @@ type SourceOption func(o *SourceOptions)
 
 var (
 	DefaultPollInterval = time.Second * 30
+	DefaultSourceName   = "MICRO:CONFIG"
 )
 
 func NewConfig(opts ...Option) Config {
