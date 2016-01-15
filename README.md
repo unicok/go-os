@@ -23,7 +23,7 @@ number of services.
 
 Package     |   Features
 -------     |   ---------
-auth        |   authentication and authorisation for users and services	
+[auth](https://godoc.org/github.com/micro/go-platform/auth)        |   authentication and authorisation for users and services	
 [config](https://godoc.org/github.com/micro/go-platform/config)      |   dynamic configuration which is namespaced and versioned
 db          |   distributed database abstraction
 [discovery](https://godoc.org/github.com/micro/go-platform/discovery)   |   extends the go-micro registry to add heartbeating, etc
