@@ -4,6 +4,9 @@ import (
 	"errors"
 	"time"
 
+	"github.com/micro/go-micro/client"
+	"github.com/micro/go-micro/server"
+
 	"golang.org/x/net/context"
 )
 
@@ -57,6 +60,18 @@ type Token struct {
 var (
 	ErrInvalidToken = errors.New("invalid token")
 )
+
+func ClientWrapper(a Auth) client.Wrapper {
+	return func(c client.Client) client.Client {
+		return &clientWrapper{c, a}
+	}
+}
+
+func HandlerWrapper(a Auth) server.HandlerWrapper {
+	return func(h server.HandlerFunc) server.HandlerFunc {
+		return handlerWrapper(h, a)
+	}
+}
 
 func NewAuth(opts ...Option) Auth {
 	return newPlatform(opts...)
