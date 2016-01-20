@@ -35,7 +35,7 @@ type Logger interface {
 	Error(args ...interface{})
 	Fatal(args ...interface{})
 	// Formatted logger
-	Debuf(format string, args ...interface{})
+	Debugf(format string, args ...interface{})
 	Infof(format string, args ...interface{})
 	Errorf(format string, args ...interface{})
 	Fatalf(format string, args ...interface{})
@@ -48,10 +48,10 @@ type Logger interface {
 
 // Event represents a single log event
 type Event struct {
-	Level     Level
-	Fields    Fields
-	Timestamp int64
-	Message   string
+	Level     Level  `json:"level"`
+	Fields    Fields `json:"fields"`
+	Timestamp int64  `json:"timestamp"`
+	Message   string `json:"message"`
 }
 
 // An output represents a file, indexer, syslog, etc
@@ -67,3 +67,15 @@ type Output interface {
 }
 
 type Option func(o *Options)
+
+type OutputOption func(o *OutputOptions)
+
+var (
+	DefaultLevel Level = InfoLevel
+
+	DefaultOutputName = "log.json"
+)
+
+func NewLog(opts ...Option) Log {
+	return newPlatform(opts...)
+}
