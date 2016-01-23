@@ -7,11 +7,25 @@ By tracking platform events we can essentially build a platform event correlatio
 ## Interface
 
 ```go
-
 type Event interface {
-
-	// Certain events may be registered or tracked here
+	// publish an event record
+	Publish(*Record) error
+	// subscribe to an event types
+	Subscribe(Handler, ...string) error
+	// used for internal purposes
 	Start() error
 	Stop() error
 }
+
+type Record struct {
+	Id        string
+	Type      string
+	Origin    string
+	Timestamp int64
+	RootId    string
+	Metadata  map[string]string
+	Data      string
+}
+
+type Handler func(*Record)
 ```
