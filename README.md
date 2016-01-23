@@ -27,8 +27,9 @@ Package     |   Features
 [config](https://godoc.org/github.com/micro/go-platform/config)      |   dynamic configuration which is namespaced and versioned
 db          |   distributed database abstraction
 [discovery](https://godoc.org/github.com/micro/go-platform/discovery)   |   extends the go-micro registry to add heartbeating, etc
+[event](https://godoc.org/github.com/micro/go-platform/event)   |   platform event publication, subscription and aggregation 
 [kv](https://godoc.org/github.com/micro/go-platform/kv)          |   simply key value layered on memcached, etcd, consul 
-log         |   structured logging to stdout, logstash, fluentd, pubsub
+[log](https://godoc.org/github.com/micro/go-platform/log)         |   structured logging to stdout, logstash, fluentd, pubsub
 [monitor](https://godoc.org/github.com/micro/go-platform/monitor)     |   add custom healthchecks measured with distributed systems in mind
 metrics     |   instrumentation and collation of counters
 router      |   global circuit breaking, load balancing, A/B testing
