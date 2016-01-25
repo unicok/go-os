@@ -27,7 +27,7 @@ type Record struct {
 type Handler func(*Record)
 
 var (
-	RecordTopic      = "platform.event.record"
+	RecordTopic      = "micro.event.record"
 	DefaultEventType = "event"
 )
 
