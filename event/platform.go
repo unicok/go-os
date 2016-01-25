@@ -57,7 +57,7 @@ func toProto(r *Record) *event.Record {
 	}
 }
 
-func (p *platform) Publish(r *Record) error {
+func (p *platform) Publish(ctx context.Context, r *Record) error {
 	if len(r.Type) == 0 {
 		r.Type = DefaultEventType
 	}
@@ -71,17 +71,17 @@ func (p *platform) Publish(r *Record) error {
 	}
 
 	pub := p.opts.Client.NewPublication(RecordTopic, toProto(r))
-	return p.opts.Client.Publish(context.TODO(), pub)
+	return p.opts.Client.Publish(ctx, pub)
 }
 
 // currently blocking
-func (p *platform) Subscribe(h Handler, types ...string) error {
+func (p *platform) Subscribe(ctx context.Context, h Handler, types ...string) error {
 	req := &ev.StreamRequest{}
 	for _, typ := range types {
 		req.Types = append(req.Types, typ)
 	}
 
-	stream, err := p.cl.Stream(context.TODO(), req)
+	stream, err := p.cl.Stream(ctx, req)
 	if err != nil {
 		return err
 	}

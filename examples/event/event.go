@@ -8,6 +8,8 @@ import (
 
 	"github.com/micro/go-micro/cmd"
 	"github.com/micro/go-platform/event"
+
+	"golang.org/x/net/context"
 )
 
 var (
@@ -53,7 +55,7 @@ func pub(ev event.Event) {
 
 		fmt.Println("Sending event", r.Id, r.Type)
 
-		if err := ev.Publish(r); err != nil {
+		if err := ev.Publish(context.TODO(), r); err != nil {
 			fmt.Println(err)
 		}
 
@@ -63,7 +65,7 @@ func pub(ev event.Event) {
 
 func sub(ev event.Event) {
 	// subscribe to event type
-	err := ev.Subscribe(func(rec *event.Record) {
+	err := ev.Subscribe(context.TODO(), func(rec *event.Record) {
 		fmt.Println("Received event", rec.Id, rec.Type)
 	}, "agent."+randType())
 

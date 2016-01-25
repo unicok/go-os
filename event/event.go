@@ -1,10 +1,14 @@
 package event
 
+import (
+	"golang.org/x/net/context"
+)
+
 type Event interface {
 	// publish an event record
-	Publish(*Record) error
+	Publish(context.Context, *Record) error
 	// subscribe to an event types
-	Subscribe(Handler, ...string) error
+	Subscribe(context.Context, Handler, ...string) error
 	// used for internal purposes
 	Start() error
 	Stop() error
