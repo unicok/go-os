@@ -2,12 +2,10 @@ package consul
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net"
 	"path/filepath"
 	"strings"
-	mtx "sync"
 	"time"
 
 	"github.com/hashicorp/consul/api"
@@ -19,127 +17,6 @@ type consulSync struct {
 	opts sync.Options
 	c    *api.Client
 	node *registry.Node
-}
-
-type consulLock struct {
-	opts sync.LockOptions
-	l    *api.Lock
-	id   string
-}
-
-type consulLeader struct {
-	opts sync.LeaderOptions
-	c    *api.Client
-
-	id  string
-	key string
-	// marshalled registry node
-	srv []byte
-
-	// used to sync back status
-	statusCh chan sync.LeaderStatus
-
-	mtx.Mutex
-	status sync.LeaderStatus
-}
-
-type consulElected struct {
-	ch chan sync.LeaderStatus
-	rv <-chan struct{}
-	l  *api.Lock
-}
-
-func (c *consulLeader) Leader() (*registry.Node, error) {
-	kv, _, err := c.c.KV().Get(c.key, nil)
-	if err != nil {
-		return nil, err
-	}
-	var node *registry.Node
-	if err := json.Unmarshal(kv.Value, &node); err != nil {
-		return nil, err
-	}
-	return node, nil
-}
-
-func (c *consulLeader) Id() string {
-	return c.id
-}
-
-func (c *consulLeader) Elect() (sync.Elected, error) {
-	lc, err := c.c.LockOpts(&api.LockOptions{
-		Key:   c.key,
-		Value: c.srv,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	rv, err := lc.Lock(nil)
-	if err != nil {
-		return nil, err
-	}
-
-	c.statusCh <- sync.ElectedStatus
-
-	// lock acquired
-	return &consulElected{
-		rv: rv,
-		l:  lc,
-		ch: c.statusCh,
-	}, nil
-}
-
-func (c *consulLeader) Status() (sync.LeaderStatus, error) {
-	c.Lock()
-	defer c.Unlock()
-	return c.status, nil
-}
-
-func (c *consulElected) Revoked() (chan struct{}, error) {
-	select {
-	case <-c.rv:
-		return nil, errors.New("already revoked")
-	default:
-	}
-
-	ch := make(chan struct{}, 1)
-
-	go func() {
-		st := <-ch
-		c.ch <- sync.FollowerStatus
-		ch <- st
-	}()
-
-	return ch, nil
-}
-
-func (c *consulElected) Resign() error {
-	c.ch <- sync.FollowerStatus
-	err := c.l.Unlock()
-	return err
-}
-
-func (c *consulLock) Id() string {
-	return c.id
-}
-
-func (c *consulLock) Acquire() error {
-	lc, err := c.l.Lock(nil)
-	if err != nil {
-		return err
-	}
-
-	select {
-	case <-lc:
-		return errors.New("lock lost")
-	default:
-	}
-
-	return nil
-}
-
-func (c *consulLock) Release() error {
-	return c.l.Unlock()
 }
 
 func (c *consulSync) Lock(id string, opts ...sync.LockOption) (sync.Lock, error) {
