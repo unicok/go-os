@@ -14,9 +14,9 @@ type LeaderStatus int32
 
 type Sync interface {
 	// distributed lock interface
-	Lock(...LockOption) (Lock, error)
+	Lock(id string, opts ...LockOption) (Lock, error)
 	// leader election interface
-	Leader(...LeaderOption) (Leader, error)
+	Leader(id string, opts ...LeaderOption) (Leader, error)
 	// Start/Stop the internal publisher
 	// used to announce this client and
 	// subscribe to announcements.
@@ -31,6 +31,7 @@ type Lock interface {
 }
 
 type Leader interface {
+	Id() string
 	// Returns the current leader
 	Leader() (*registry.Node, error)
 	// Elect self to become leader
@@ -42,11 +43,17 @@ type Leader interface {
 type Elected interface {
 	// Returns a channel which indicates
 	// when the leadership is revoked
-	Revoked() (chan bool, error)
+	Revoked() (chan struct{}, error)
 	// Resign the leadership
 	Resign() error
 }
 
+type Option func(o *Options)
+
 type LockOption func(o *LockOptions)
 
 type LeaderOption func(o *LeaderOptions)
+
+var (
+	DefaultNamespace = "/micro/sync"
+)
