@@ -25,12 +25,16 @@ type Sync interface {
 }
 
 type Lock interface {
+	// The unique ID to lock on
 	Id() string
+	// Acquire the lock
 	Acquire() error
+	// Release the lock
 	Release() error
 }
 
 type Leader interface {
+	// The unique ID to synchronize with
 	Id() string
 	// Returns the current leader
 	Leader() (*registry.Node, error)

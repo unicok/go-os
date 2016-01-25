@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/micro/go-micro/registry"
 	"github.com/micro/go-platform/sync"
 	"github.com/micro/go-platform/sync/consul"
 )
@@ -45,7 +46,13 @@ func leader(i int, s sync.Sync) {
 		return
 	}
 
-	leaderStatus(i, l, "attempting to elect self")
+	leader, err := l.Leader()
+	if err != nil {
+		fmt.Printf("[leader:%d] err getting current leader %v\n", i, err)
+		leaderStatus(i, l, "attempting to elect self")
+	} else {
+		leaderStatus(i, l, fmt.Sprintf("attempting to elect self. current leader %v", leader))
+	}
 
 	// Attempt to elect self
 	throne, err := l.Elect()
@@ -83,6 +90,13 @@ loop:
 		j++
 	}
 
+	leader, err = l.Leader()
+	if err != nil {
+		fmt.Printf("[leader:%d] err getting current leader %v\n", i, err)
+	} else {
+		leaderStatus(i, l, fmt.Sprintf("current leader %v", leader))
+	}
+
 	leaderStatus(i, l, "resigning now")
 
 	// Resign leadership status
@@ -94,13 +108,31 @@ loop:
 }
 
 func main() {
+	// Acquire locks
 	for i := 0; i < 2; i++ {
 		go acquire(i, consul.NewSync())
 	}
 	acquire(2, consul.NewSync())
+
+	// Acquire leadership
 	for i := 0; i < 2; i++ {
-		go leader(i, consul.NewSync())
+		go leader(i, consul.NewSync(
+			sync.Service(&registry.Service{
+				Name:    "foo",
+				Version: "latest",
+				Nodes:   []*registry.Node{&registry.Node{Id: fmt.Sprintf("foo-%d", i)}},
+			}),
+		))
 	}
-	leader(2, consul.NewSync())
+
+	leader(2, consul.NewSync(
+		sync.Service(&registry.Service{
+			Name:    "foo",
+			Version: "latest",
+			Nodes:   []*registry.Node{&registry.Node{Id: "foo-2"}},
+		}),
+	))
+
+	// Sleep just for fun
 	time.Sleep(time.Second * 5)
 }
