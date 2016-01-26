@@ -33,4 +33,5 @@ db          |   distributed database abstraction
 [monitor](https://godoc.org/github.com/micro/go-platform/monitor)     |   add custom healthchecks measured with distributed systems in mind
 metrics     |   instrumentation and collation of counters
 router      |   global circuit breaking, load balancing, A/B testing
+[sync](https://godoc.org/github.com/micro/go-platform/sync)       |   distributed locking, leadership election, etc
 [trace](https://godoc.org/github.com/micro/go-platform/trace)       |   distributed tracing of request/response
