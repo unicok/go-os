@@ -1,7 +1,10 @@
 package metrics
 
+type Fields map[string]string
+
 // Metrics provides a way to instrument application data
 type Metrics interface {
+	Init(...Option) error
 	Counter(id string) Counter
 	Gauge(id string) Gauge
 	Histogram(id string) Histogram
@@ -17,16 +20,26 @@ type Counter interface {
 	Decr(d uint64)
 	// Reset the counter
 	Reset()
+	// Label the counter
+	WithFields(f Fields) Counter
 }
 
 type Gauge interface {
 	// Set the gauge value
 	Set(d int64)
+	// Reset the gauge
+	Reset()
+	// Label the gauge
+	WithFields(f Fields) Gauge
 }
 
 type Histogram interface {
 	// Record a timing
 	Record(d int64)
+	// Reset the histogram
+	Reset()
+	// Label the histogram
+	WithFields(f Fields) Histogram
 }
 
 type Option func(o *Options)
