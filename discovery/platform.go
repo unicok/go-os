@@ -359,11 +359,11 @@ func (p *platform) update(res *registry.Result) {
 }
 
 // TODO: publish event
-func (p *platform) Register(s *registry.Service) error {
+func (p *platform) Register(s *registry.Service, opts ...registry.RegisterOption) error {
 	p.Lock()
 	defer p.Unlock()
 
-	if err := p.opts.Registry.Register(s); err != nil {
+	if err := p.opts.Registry.Register(s, opts...); err != nil {
 		return err
 	}
 
