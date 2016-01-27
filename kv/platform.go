@@ -303,3 +303,7 @@ func (p *platform) Stop() error {
 
 	return nil
 }
+
+func (p *platform) String() string {
+	return "platform"
+}

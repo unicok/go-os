@@ -14,6 +14,7 @@ type Monitor interface {
 	HealthChecks() ([]HealthChecker, error)
 	Start() error
 	Stop() error
+	String() string
 }
 
 type HealthChecker interface {

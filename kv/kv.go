@@ -19,6 +19,8 @@ type KV interface {
 	// etc
 	Start() error
 	Stop() error
+	// Name
+	String() string
 }
 
 type Item struct {

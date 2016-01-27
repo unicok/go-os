@@ -45,6 +45,8 @@ type Trace interface {
 	Start() error
 	// Stop the collector
 	Stop() error
+	// Name
+	String() string
 }
 
 type Span struct {

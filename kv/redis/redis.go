@@ -50,6 +50,10 @@ func (r *rkv) Stop() error {
 	return nil
 }
 
+func (r *rkv) String() string {
+	return "redis"
+}
+
 func NewKV(opts ...kv.Option) kv.KV {
 	var options kv.Options
 	for _, o := range opts {

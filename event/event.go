@@ -12,6 +12,8 @@ type Event interface {
 	// used for internal purposes
 	Start() error
 	Stop() error
+	// Name
+	String() string
 }
 
 type Record struct {

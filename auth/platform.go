@@ -206,3 +206,7 @@ func (p *platform) Stop() error {
 	p.running = false
 	return nil
 }
+
+func (p *platform) String() string {
+	return "platform"
+}

@@ -253,3 +253,7 @@ func (p *platform) Stop() error {
 	p.exit = nil
 	return nil
 }
+
+func (p *platform) String() string {
+	return "platform"
+}

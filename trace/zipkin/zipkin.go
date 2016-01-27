@@ -302,6 +302,10 @@ func (z *zipkin) Stop() error {
 	return nil
 }
 
+func (z *zipkin) String() string {
+	return "zipkin"
+}
+
 func NewTrace(opts ...trace.Option) trace.Trace {
 	return newZipkin(opts...)
 }

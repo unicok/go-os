@@ -22,6 +22,8 @@ type Sync interface {
 	// subscribe to announcements.
 	Start() error
 	Stop() error
+	// Name of sync
+	String() string
 }
 
 type Lock interface {

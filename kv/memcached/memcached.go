@@ -50,6 +50,10 @@ func (m *mkv) Stop() error {
 	return nil
 }
 
+func (m *mkv) String() string {
+	return "memcached"
+}
+
 func NewKV(opts ...kv.Option) kv.KV {
 	var options kv.Options
 	for _, o := range opts {

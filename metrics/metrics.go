@@ -11,6 +11,8 @@ type Metrics interface {
 	// Start/Stop a batched collector
 	Start() error
 	Stop() error
+	// Name
+	String() string
 }
 
 type Counter interface {

@@ -92,6 +92,10 @@ func (c *consulSync) Leader(id string, opts ...sync.LeaderOption) (sync.Leader, 
 	return cl, nil
 }
 
+func (c *consulSync) String() string {
+	return "consul"
+}
+
 func (c *consulSync) Start() error {
 	return nil
 }
