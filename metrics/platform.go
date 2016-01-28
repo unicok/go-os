@@ -55,6 +55,7 @@ func newPlatform(opts ...Option) Metrics {
 
 	return &platform{
 		opts: options,
+		buf:  make(chan string, 1000),
 	}
 }
 
@@ -239,7 +240,6 @@ func (p *platform) Start() error {
 		return err
 	}
 	p.conn = conn
-	p.buf = make(chan string, 1000)
 	p.exit = make(chan bool)
 	p.running = true
 	go p.run()
