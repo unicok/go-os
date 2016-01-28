@@ -1,5 +1,9 @@
 package metrics
 
+import (
+	"time"
+)
+
 type Fields map[string]string
 
 // Metrics provides a way to instrument application data
@@ -45,3 +49,12 @@ type Histogram interface {
 }
 
 type Option func(o *Options)
+
+func NewMetrics(opts ...Option) Metrics {
+	return newPlatform(opts...)
+}
+
+var (
+	DefaultNamespace     = "micro"
+	DefaultBatchInterval = time.Second * 5
+)
