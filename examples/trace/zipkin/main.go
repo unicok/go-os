@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/micro/go-micro/client"
 	"github.com/micro/go-micro/cmd"
-	c "github.com/micro/go-micro/context"
 	example "github.com/micro/go-micro/examples/server/proto/example"
+	"github.com/micro/go-micro/metadata"
 	"github.com/micro/go-platform/trace"
 	"github.com/micro/go-platform/trace/zipkin"
 	"golang.org/x/net/context"
@@ -19,7 +19,7 @@ func pub() {
 	})
 
 	// create context with metadata
-	ctx := c.WithMetadata(context.Background(), map[string]string{
+	ctx := metadata.NewContext(context.Background(), map[string]string{
 		"X-User-Id": "john",
 		"X-From-Id": "script",
 	})
@@ -40,7 +40,7 @@ func call(i int) {
 	})
 
 	// create context with metadata
-	ctx := c.WithMetadata(context.Background(), map[string]string{
+	ctx := metadata.NewContext(context.Background(), map[string]string{
 		"X-User-Id": "john",
 		"X-From-Id": "script",
 	})

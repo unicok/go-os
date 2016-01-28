@@ -2,7 +2,7 @@ package auth
 
 import (
 	"github.com/micro/go-micro/client"
-	co "github.com/micro/go-micro/context"
+	"github.com/micro/go-micro/metadata"
 	"github.com/micro/go-micro/server"
 
 	"golang.org/x/net/context"
@@ -28,7 +28,7 @@ func (c *clientWrapper) Call(ctx context.Context, req client.Request, rsp interf
 	newCtx := c.a.NewContext(ctx, t)
 
 	// set metadata
-	newCtx = co.WithMetadata(newCtx, c.a.NewHeader(map[string]string{}, t))
+	newCtx = metadata.NewContext(newCtx, c.a.NewHeader(map[string]string{}, t))
 
 	// circuit break, check authorization here
 	t, err = c.a.Authorized(newCtx, req)

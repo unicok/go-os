@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/micro/go-micro/client"
-	co "github.com/micro/go-micro/context"
+	"github.com/micro/go-micro/metadata"
 
 	"github.com/micro/auth-srv/proto/oauth2"
 	"golang.org/x/net/context"
@@ -110,7 +110,7 @@ func (p *platform) Token() (*Token, error) {
 func (p *platform) Introspect(ctx context.Context) (*Token, error) {
 	t, ok := p.FromContext(ctx)
 	if !ok {
-		md, kk := co.GetMetadata(ctx)
+		md, kk := metadata.FromContext(ctx)
 		if !kk {
 			return nil, ErrInvalidToken
 		}

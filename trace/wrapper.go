@@ -2,7 +2,7 @@ package trace
 
 import (
 	"github.com/micro/go-micro/client"
-	co "github.com/micro/go-micro/context"
+	"github.com/micro/go-micro/metadata"
 	"github.com/micro/go-micro/registry"
 	"github.com/micro/go-micro/server"
 	"time"
@@ -23,7 +23,7 @@ func (c *clientWrapper) Call(ctx context.Context, req client.Request, rsp interf
 
 	// Expectation is that we're the initiator of tracing
 	// So get trace info from metadata
-	md, ok := co.GetMetadata(ctx)
+	md, ok := metadata.FromContext(ctx)
 	if !ok {
 		// this is a new span
 		span = c.t.NewSpan(nil)
@@ -52,7 +52,7 @@ func (c *clientWrapper) Call(ctx context.Context, req client.Request, rsp interf
 	// set context key
 	newCtx := c.t.NewContext(ctx, span)
 	// set metadata
-	newCtx = co.WithMetadata(newCtx, c.t.NewHeader(md, span))
+	newCtx = metadata.NewContext(newCtx, c.t.NewHeader(md, span))
 
 	// mark client request
 	span.Annotations = append(span.Annotations, &Annotation{
@@ -101,7 +101,7 @@ func handlerWrapper(fn server.HandlerFunc, t Trace, s *registry.Service) server.
 
 		// Expectation is that we're the initiator of tracing
 		// So get trace info from metadata
-		md, ok := co.GetMetadata(ctx)
+		md, ok := metadata.FromContext(ctx)
 		if !ok {
 			// this is a new span
 			span = t.NewSpan(nil)
