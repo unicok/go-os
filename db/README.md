@@ -2,6 +2,8 @@
 
 Provides a high level pluggable abstraction for databases.
 
+**This might be removed**
+
 ## Interface
 
 Initial thoughts lie around a CRUD interface. The number of times 
@@ -14,5 +16,5 @@ Event sourcing can be tackled in a separate package.
 ## Supported Databases
 
 - Cassandra
-- ?
-- ?
+- MariaDB
+- Elasticsearch
