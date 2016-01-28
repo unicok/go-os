@@ -42,21 +42,15 @@ var (
 )
 
 func newPlatform(opts ...Option) Metrics {
-	var options Options
+	options := Options{
+		Namespace:     DefaultNamespace,
+		BatchInterval: DefaultBatchInterval,
+		Collectors:    []string{"127.0.0.1:8125"},
+		Fields:        make(Fields),
+	}
+
 	for _, o := range opts {
 		o(&options)
-	}
-
-	if len(options.Namespace) == 0 {
-		options.Namespace = DefaultNamespace
-	}
-
-	if options.BatchInterval == time.Duration(0) {
-		options.BatchInterval = DefaultBatchInterval
-	}
-
-	if len(options.Collectors) == 0 {
-		options.Collectors = []string{"127.0.0.1:8125"}
 	}
 
 	return &platform{
@@ -212,7 +206,7 @@ func (p *platform) Counter(id string) Counter {
 	return &counter{
 		id:  id,
 		buf: p.buf,
-		f:   make(Fields),
+		f:   p.opts.Fields,
 	}
 }
 
@@ -220,7 +214,7 @@ func (p *platform) Gauge(id string) Gauge {
 	return &gauge{
 		id:  id,
 		buf: p.buf,
-		f:   make(Fields),
+		f:   p.opts.Fields,
 	}
 }
 
@@ -228,7 +222,7 @@ func (p *platform) Histogram(id string) Histogram {
 	return &histogram{
 		id:  id,
 		buf: p.buf,
-		f:   make(Fields),
+		f:   p.opts.Fields,
 	}
 }
 

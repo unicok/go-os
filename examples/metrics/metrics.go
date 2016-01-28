@@ -1,0 +1,43 @@
+package main
+
+import (
+	"fmt"
+	"time"
+
+	"github.com/micro/go-platform/metrics"
+)
+
+func main() {
+	// create new metrics
+	m := metrics.NewMetrics(
+		metrics.Namespace("io.micro"),
+		metrics.WithFields(metrics.Fields{
+			"region":  "eu-west-1",
+			"service": "foo",
+		}),
+		metrics.Collectors([]string{
+			// telegraf/statsd address
+			"127.0.0.1:8125",
+		}),
+	)
+
+	// Start the collector
+	if err := m.Start(); err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	c := m.Counter("example.counters.foo")
+	g := m.Gauge("example.gauges.foo")
+	h := m.Histogram("example.histograms.foo")
+
+	for i := 0; i < 100; i++ {
+		fmt.Println(time.Now().String(), "Sending metrics")
+		c.Incr(uint64(i))
+		g.Set(int64(i))
+		h.Record(time.Now().Unix() * 1e3)
+		time.Sleep(time.Millisecond * 10)
+	}
+
+	time.Sleep(time.Second * 5)
+}
