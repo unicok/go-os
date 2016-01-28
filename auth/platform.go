@@ -23,11 +23,7 @@ type platform struct {
 	exit    chan bool
 }
 
-type contextKeyT string
-
-var (
-	contextKey = contextKeyT("github.com/micro/go-platform/auth")
-)
+type authKey struct{}
 
 func newPlatform(opts ...Option) Auth {
 	var options Options
@@ -151,12 +147,12 @@ func (p *platform) Revoke(t *Token) error {
 }
 
 func (p *platform) FromContext(ctx context.Context) (*Token, bool) {
-	t, ok := ctx.Value(contextKey).(*Token)
+	t, ok := ctx.Value(authKey{}).(*Token)
 	return t, ok
 }
 
 func (p *platform) NewContext(ctx context.Context, t *Token) context.Context {
-	return context.WithValue(ctx, contextKey, t)
+	return context.WithValue(ctx, authKey{}, t)
 }
 
 func (p *platform) FromHeader(hd map[string]string) (*Token, bool) {

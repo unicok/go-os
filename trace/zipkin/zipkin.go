@@ -18,11 +18,7 @@ import (
 	"golang.org/x/net/context"
 )
 
-type contextKeyT string
-
-var (
-	contextKey = contextKeyT("github.com/micro/go-platform/trace/zipkin")
-)
+type zipkinKey struct{}
 
 type zipkin struct {
 	opts  trace.Options
@@ -229,12 +225,12 @@ func (z *zipkin) NewSpan(s *trace.Span) *trace.Span {
 }
 
 func (z *zipkin) FromContext(ctx context.Context) (*trace.Span, bool) {
-	s, ok := ctx.Value(contextKey).(*trace.Span)
+	s, ok := ctx.Value(zipkinKey{}).(*trace.Span)
 	return s, ok
 }
 
 func (z *zipkin) NewContext(ctx context.Context, s *trace.Span) context.Context {
-	return context.WithValue(ctx, contextKey, s)
+	return context.WithValue(ctx, zipkinKey{}, s)
 }
 
 func (z *zipkin) FromHeader(md map[string]string) (*trace.Span, bool) {
