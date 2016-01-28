@@ -31,7 +31,7 @@ db          |   distributed database abstraction
 [kv](https://godoc.org/github.com/micro/go-platform/kv)          |   simply key value layered on memcached, etcd, consul 
 [log](https://godoc.org/github.com/micro/go-platform/log)         |   structured logging to stdout, logstash, fluentd, pubsub
 [monitor](https://godoc.org/github.com/micro/go-platform/monitor)     |   add custom healthchecks measured with distributed systems in mind
-metrics     |   instrumentation and collation of counters
+[metrics](https://godoc.org/github.com/micro/go-platform/metrics)     |   instrumentation and collation of counters
 router      |   global circuit breaking, load balancing, A/B testing
 [sync](https://godoc.org/github.com/micro/go-platform/sync)       |   distributed locking, leadership election, etc
 [trace](https://godoc.org/github.com/micro/go-platform/trace)       |   distributed tracing of request/response
