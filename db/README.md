@@ -13,6 +13,27 @@ pain. Going lower level than this doesn't pose any value.
 
 Event sourcing can be tackled in a separate package.
 
+```go
+type DB interface {
+	Init(...Option) error
+	Read(id string) (Record, error)
+	Create(id string, v Record) error
+	Update(id string, v Record) error
+	Delete(id string) error
+	Search(md Metadata) ([]Record, error)
+	String() string
+}
+
+type Metadata map[string]interface{}
+
+type Record interface {
+	Id() string
+	Metadata() Metadata
+	Bytes() []byte
+	Scan(v interface{}) error
+}
+```
+
 ## Supported Databases
 
 - Cassandra
