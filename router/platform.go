@@ -7,6 +7,7 @@ import (
 	"github.com/micro/go-micro/client"
 	"github.com/micro/go-micro/registry"
 	"github.com/micro/go-micro/selector"
+	"github.com/micro/go-micro/selector/blacklist"
 	"github.com/micro/go-micro/server"
 
 	"golang.org/x/net/context"
@@ -57,7 +58,7 @@ func newPlatform(opts ...selector.Option) Router {
 		opts:     options,
 		client:   c,
 		server:   s,
-		selector: selector.NewSelector(selector.Registry(options.Registry)),
+		selector: blacklist.NewSelector(selector.Registry(options.Registry)),
 	}
 }
 
@@ -95,7 +96,7 @@ func (p *platform) Init(opts ...selector.Option) error {
 
 	if options.Registry != nil {
 		p.opts.Registry = options.Registry
-		p.selector = selector.NewSelector(selector.Registry(options.Registry))
+		p.selector = blacklist.NewSelector(selector.Registry(options.Registry))
 	}
 
 	if c, ok := client.FromContext(options.Context); ok {
