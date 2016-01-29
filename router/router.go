@@ -14,3 +14,7 @@ type Router interface {
 	Start() error
 	Stop() error
 }
+
+func NewRouter(opts ...selector.Option) Router {
+	return newPlatform(opts...)
+}
