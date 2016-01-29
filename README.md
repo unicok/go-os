@@ -11,10 +11,6 @@ Go platform depends on middleware/before-after funcs being added to
 go-micro. While each package can be used independently, it will be 
 much more powerful as a whole.
 
-The libraries here are not yet implemented. Discussion for 
-the interfaces are welcome.
-
-Note. Go-platform will include 1-3 supported implementations of each feature. 
 Further community wide features should be contributed to [go-plugins](https://github.com/micro/go-plugins).
 
 ## Features
@@ -35,3 +31,7 @@ Package     |   Features
 [router](https://godoc.org/github.com/micro/go-platform/router)      |   global circuit breaking, load balancing, A/B testing
 [sync](https://godoc.org/github.com/micro/go-platform/sync)       |   distributed locking, leadership election, etc
 [trace](https://godoc.org/github.com/micro/go-platform/trace)       |   distributed tracing of request/response
+
+## What's it even good for?
+
+![Micro On-Demand](https://github.com/micro/micro/blob/master/doc/ondemand.png)
