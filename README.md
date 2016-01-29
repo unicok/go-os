@@ -34,4 +34,7 @@ Package     |   Features
 
 ## What's it even good for?
 
+The Micro platform is useful for where you want to build a reliable globally distributed systems platform at scale. 
+You would be in good company by doing so, with the likes of Google, Facebook, Amazon, Twitter, Uber, Hailo, etc, etc.
+
 ![Micro On-Demand](https://github.com/micro/micro/blob/master/doc/ondemand.png)
