@@ -23,17 +23,20 @@ type cache struct {
 	// current position
 	sync.Mutex
 	pointer int
-	nodes   int
+	nodes   map[string]bool
 }
 
 func newCache(services []*registry.Service, expires int64) *cache {
 	cache := &cache{
 		services: services,
 		expires:  expires,
+		nodes:    make(map[string]bool),
 	}
 
 	for _, service := range services {
-		cache.nodes += len(service.Nodes)
+		for _, node := range service.Nodes {
+			cache.nodes[node.Id] = true
+		}
 	}
 
 	return cache
@@ -69,7 +72,7 @@ func (c *cache) Filter(filters []selector.SelectFilter) (selector.Next, error) {
 
 	c.Lock()
 	p := c.pointer
-	if c.pointer >= c.nodes {
+	if c.pointer >= len(c.nodes) {
 		c.pointer = 0
 	} else {
 		c.pointer++

@@ -142,19 +142,113 @@ func (p *platform) subscribe() {
 	// create cache
 	// create stats
 
-	return
+	streams := make(map[string]bool)
+	t := time.NewTicker(publishInterval)
+
+	fn := func(service string, exit chan bool) {
+		for {
+			select {
+			case <-exit:
+				return
+			default:
+				p.stream(service)
+				time.Sleep(time.Millisecond * 100)
+			}
+		}
+	}
+
+	for {
+		select {
+		case <-p.exit:
+			t.Stop()
+			return
+		case <-t.C:
+			p.RLock()
+			cache := p.cache
+			p.RUnlock()
+
+			for name, _ := range cache {
+				if _, ok := streams[name]; ok {
+					continue
+				}
+				fn(name, p.exit)
+				streams[name] = true
+			}
+		}
+	}
+}
+
+func (p *platform) stream(service string) {
+	stream, err := p.r.SelectStream(context.TODO(), &proto.SelectRequest{Service: service})
+	if err != nil {
+		return
+	}
+
+	exit := make(chan bool)
+
+	defer func() {
+		close(exit)
+	}()
+
+	go func() {
+		select {
+		case <-exit:
+			// probably errored
+		case <-p.exit:
+			stream.Close()
+		}
+	}()
+
+	for {
+		rsp, err := stream.Recv()
+		if err != nil {
+			return
+		}
+
+		var services []*registry.Service
+		nodes := make(map[string]bool)
+
+		for _, serv := range rsp.Services {
+			rservice := protoToService(serv)
+			services = append(services, rservice)
+
+			// create stats
+			for _, node := range rservice.Nodes {
+				p.newStats(rservice, node)
+				nodes[node.Id] = true
+			}
+		}
+
+		p.Lock()
+		// delete nodes from stats that have been removed
+		// we might actually lost stats by doing this
+		// TODO: move to a reaper
+		if s, ok := p.cache[service]; ok {
+			for node, _ := range s.nodes {
+				if _, ok := nodes[node]; !ok {
+					delete(p.stats, node)
+				}
+			}
+		}
+
+		// cache the service
+		p.cache[service] = newCache(services, rsp.Expires)
+		p.Unlock()
+	}
 }
 
 func (p *platform) rselect(service string) (*cache, error) {
 	// check the cache
 	p.RLock()
 	if c, ok := p.cache[service]; ok {
-		p.RUnlock()
-		return c, nil
+		if c.expires == -1 || c.expires > time.Now().Unix() {
+			p.RUnlock()
+			return c, nil
+		}
 	}
 	p.RUnlock()
 
-	// not cached
+	// not cached or expired
 
 	// call router to get selection for service
 	rsp, err := p.r.Select(context.TODO(), &proto.SelectRequest{
@@ -189,6 +283,8 @@ func (p *platform) rselect(service string) (*cache, error) {
 
 func (p *platform) run() {
 	t := time.NewTicker(publishInterval)
+
+	go p.subscribe()
 
 	for {
 		select {
