@@ -124,7 +124,7 @@ func (s *stats) ToProto(client *registry.Service) *router.Stats {
 	}
 
 	for name, endpoint := range s.endpoints {
-		stats.Endpoints = append(stats.Endpoints, &router.Endpoint{
+		stats.EndpointStats = append(stats.EndpointStats, &router.EndpointStats{
 			Name: name,
 			Errors: &router.Metrics{
 				Count:   endpoint.errors.Count(),

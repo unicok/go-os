@@ -12,14 +12,15 @@ message Stats {
 	// Selected stats
 	Selected selected = 5;
 	// Endpoint stats
-	repeated Endpoint endpoints = 6;
+	repeated EndpointStats endpoint_stats = 6;
 }
 
 message Service {
-        string name = 1;
-        string version = 2;
-	repeated Node nodes = 3;
-        map<string,string> metadata = 4;
+	string name = 1;
+	string version = 2;
+	map<string,string> metadata = 3;
+	repeated Endpoint endpoints = 4;
+	repeated Node nodes = 5;
 }
 
 message Node {
@@ -29,13 +30,26 @@ message Node {
         map<string,string> metadata = 4;
 }
 
+message Endpoint {
+	string name = 1;
+	Value request = 2;
+	Value response = 3;
+	map<string, string> metadata = 4;
+}
+
+message Value {
+	string name = 1;
+	string type = 2;
+	repeated Value values = 3;
+}
+
 message Selected {
 	Metrics errors = 7;
 	Metrics success = 5;
 	Metrics dropped = 6;
 }
 
-message Endpoint {
+message EndpointStats {
 	// Name of the endpoint
 	string name = 1;
 	// Success and error rates
@@ -50,3 +64,4 @@ message Metrics {
 	double std_dev = 3;
 	double upper95 = 4;
 }
+

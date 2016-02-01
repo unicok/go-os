@@ -9,10 +9,9 @@ import (
 	"github.com/micro/go-micro/client"
 	"github.com/micro/go-micro/registry"
 	"github.com/micro/go-micro/selector"
-	"github.com/micro/go-micro/selector/blacklist"
 	"github.com/micro/go-micro/server"
 
-	"github.com/micro/go-platform/router/proto"
+	proto "github.com/micro/router-srv/proto/router"
 
 	"golang.org/x/net/context"
 )
@@ -20,11 +19,10 @@ import (
 type platform struct {
 	opts selector.Options
 
-	// fallback selector
-	selector selector.Selector
-
 	client client.Client
 	server server.Server
+
+	r proto.RouterClient
 
 	// TODO
 	// selector cache service:[]versions
@@ -34,6 +32,8 @@ type platform struct {
 	running bool
 	exit    chan bool
 	stats   map[string]*stats
+
+	cache map[string]*cache
 }
 
 var (
@@ -42,8 +42,7 @@ var (
 
 func newPlatform(opts ...selector.Option) Router {
 	options := selector.Options{
-		Registry: registry.DefaultRegistry,
-		Context:  context.TODO(),
+		Context: context.TODO(),
 	}
 
 	for _, o := range opts {
@@ -61,29 +60,29 @@ func newPlatform(opts ...selector.Option) Router {
 	}
 
 	return &platform{
-		opts:     options,
-		client:   c,
-		server:   s,
-		selector: blacklist.NewSelector(selector.Registry(options.Registry)),
-		stats:    make(map[string]*stats),
+		opts:   options,
+		client: c,
+		server: s,
+		cache:  make(map[string]*cache),
+		stats:  make(map[string]*stats),
+		r:      proto.NewRouterClient("go.micro.srv.router", c),
 	}
 }
 
-func serviceToProto(s *registry.Service) *router.Service {
-	if s == nil || len(s.Nodes) == 0 {
-		return nil
+func (p *platform) newStats(s *registry.Service, node *registry.Node) {
+	p.Lock()
+	defer p.Unlock()
+
+	if _, ok := p.stats[node.Id]; ok {
+		return
 	}
-	return &router.Service{
+
+	p.stats[node.Id] = newStats(&registry.Service{
 		Name:     s.Name,
 		Version:  s.Version,
 		Metadata: s.Metadata,
-		Nodes: []*router.Node{&router.Node{
-			Id:       s.Nodes[0].Id,
-			Address:  s.Nodes[0].Address,
-			Port:     int64(s.Nodes[0].Port),
-			Metadata: s.Nodes[0].Metadata,
-		}},
-	}
+		Nodes:    []*registry.Node{node},
+	})
 }
 
 func (p *platform) publish() {
@@ -92,6 +91,9 @@ func (p *platform) publish() {
 
 	opts := p.server.Options()
 
+	// temporarily build client Service
+	// should just be pulled from opts.Service()
+	// or something like that
 	var addr, host string
 	var port int
 
@@ -110,6 +112,7 @@ func (p *platform) publish() {
 		host = addr
 	}
 
+	// the client service. this is us
 	service := &registry.Service{
 		Name:    opts.Name,
 		Version: opts.Version,
@@ -121,16 +124,67 @@ func (p *platform) publish() {
 		}},
 	}
 
-	// publish all the stats
+	// publish all the stats and reset
 	for _, stat := range p.stats {
-		pub := p.client.NewPublication(StatsTopic, stat.ToProto(service))
-		go p.client.Publish(context.TODO(), pub)
+		// create publication
+		msg := p.client.NewPublication(StatsTopic, stat.ToProto(service))
+		// reset the stats
+		stat.Reset()
+		// publish message
+		go p.client.Publish(context.TODO(), msg)
 	}
 }
 
 func (p *platform) subscribe() {
 	// TODO: subscribe to stream of updates from router
+	// send request for every service
+	// recv for every service
+	// create cache
+	// create stats
+
 	return
+}
+
+func (p *platform) rselect(service string) (*cache, error) {
+	// check the cache
+	p.RLock()
+	if c, ok := p.cache[service]; ok {
+		p.RUnlock()
+		return c, nil
+	}
+	p.RUnlock()
+
+	// not cached
+
+	// call router to get selection for service
+	rsp, err := p.r.Select(context.TODO(), &proto.SelectRequest{
+		Service: service,
+	})
+
+	// error then bail
+	if err != nil {
+		return nil, err
+	}
+
+	// translate from proto to *registry.Service
+	var services []*registry.Service
+	for _, serv := range rsp.Services {
+		rservice := protoToService(serv)
+		services = append(services, rservice)
+
+		// create stats
+		for _, node := range rservice.Nodes {
+			p.newStats(rservice, node)
+		}
+	}
+
+	// cache the service
+	c := newCache(services, rsp.Expires)
+	p.Lock()
+	p.cache[service] = c
+	p.Unlock()
+
+	return c, nil
 }
 
 func (p *platform) run() {
@@ -155,13 +209,9 @@ func (p *platform) Init(opts ...selector.Option) error {
 
 	// TODO: Fix. This might all be really bad and hacky
 
-	if options.Registry != nil {
-		p.opts.Registry = options.Registry
-		p.selector = blacklist.NewSelector(selector.Registry(options.Registry))
-	}
-
 	if c, ok := client.FromContext(options.Context); ok {
 		p.client = c
+		p.r = proto.NewRouterClient("go.micro.srv.router", c)
 	}
 
 	if s, ok := server.FromContext(options.Context); ok {
@@ -176,7 +226,15 @@ func (p *platform) Options() selector.Options {
 }
 
 func (p *platform) Record(r Request, node *registry.Node, d time.Duration, err error) {
-	return
+	p.Lock()
+	defer p.Unlock()
+
+	stats, ok := p.stats[node.Id]
+	if !ok {
+		return
+	}
+
+	stats.Record(r, node, d, err)
 }
 
 func (p *platform) Stats() ([]*Stats, error) {
@@ -184,21 +242,31 @@ func (p *platform) Stats() ([]*Stats, error) {
 }
 
 func (p *platform) Select(service string, opts ...selector.SelectOption) (selector.Next, error) {
-	// TODO: read from cache
-	// fallback to selector
-	return p.selector.Select(service, opts...)
+	// create options
+	var options selector.SelectOptions
+	for _, o := range opts {
+		o(&options)
+	}
+
+	// get service from the cache
+	// or call the router for list
+	cache, err := p.rselect(service)
+	if err != nil {
+		return nil, err
+	}
+	return cache.Filter(options.Filters)
 }
 
 func (p *platform) Mark(service string, node *registry.Node, err error) {
 	p.Lock()
 	defer p.Unlock()
 
-	p.selector.Mark(service, node, err)
-
 	stats, ok := p.stats[node.Id]
 	if !ok {
 		return
 	}
+
+	// mark result for the node
 	stats.Mark(service, node, err)
 }
 
@@ -206,23 +274,16 @@ func (p *platform) Reset(service string) {
 	p.Lock()
 	defer p.Unlock()
 
-	p.selector.Reset(service)
-
-	// reset counters and stats
+	// reset stats for the service
 	for _, stat := range p.stats {
-		if stat.service.Name != service {
-			continue
+		if stat.service.Name == service {
+			stat.Reset()
 		}
-		stat.Reset()
 	}
 }
 
 func (p *platform) Close() error {
-	// Should we clear the cache?
-	// Should we not stop?
-	p.Stop()
-	// close the selector
-	return p.selector.Close()
+	return p.Stop()
 }
 
 func (p *platform) Start() error {
