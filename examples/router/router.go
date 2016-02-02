@@ -14,28 +14,34 @@ import (
 )
 
 var (
-	service = "go.micro.srv.router"
+	routines = 3
+	requests = 100
+	service  = "go.micro.srv.router"
 )
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
 }
 
-func selector(id int, r router.Router) {
+func selector(id int, r router.Router) map[string]int {
+	stats := make(map[string]int)
+
 	// select the service
 	next, err := r.Select(service)
 	if err != nil {
 		fmt.Println(id, "error selecting", err)
-		return
+		return stats
 	}
 
-	for i := 1; i < 1000; i++ {
+	for i := 1; i <= requests; i++ {
 		// get a node
 		node, err := next()
 		if err != nil {
 			fmt.Println(id, "error getting next", err)
-			return
+			return stats
 		}
+
+		stats[node.Id]++
 
 		// make some request
 		// client.Call(foo, request)
@@ -61,9 +67,11 @@ func selector(id int, r router.Router) {
 		// record timing
 		r.Record(req, node, dur, err)
 
-		fmt.Println(id, "selected", node.Id)
+		//fmt.Println(id, "selected", node.Id)
 		time.Sleep(time.Millisecond*10 + time.Duration(rand.Int()%10))
 	}
+
+	return stats
 }
 
 func main() {
@@ -76,14 +84,35 @@ func main() {
 		return
 	}
 
-	for i := 0; i < 3; i++ {
-		go selector(i, r)
+	ch := make(chan map[string]int, routines)
+	stats := make(map[string]int)
+
+	for i := 0; i < routines; i++ {
+		go func(j int) {
+			st := selector(j, r)
+			str := ""
+			for k, v := range st {
+				str += fmt.Sprintf("stats %d %s %d\n", j, k, v)
+			}
+			fmt.Println(str)
+			ch <- st
+		}(i)
 	}
 
-	selector(3, r)
+	// collate stats
+	for i := 0; i < routines; i++ {
+		st := <-ch
+		for k, v := range st {
+			stats[k] += v
+		}
+	}
 
 	if err := r.Stop(); err != nil {
 		fmt.Println(err)
 		return
+	}
+
+	for k, v := range stats {
+		fmt.Println("overall stats", k, v)
 	}
 }
