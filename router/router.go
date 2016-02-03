@@ -41,7 +41,8 @@ type Request interface {
 }
 
 var (
-	StatsTopic = "platform.router.stats"
+	StatsTopic  = "platform.router.stats"
+	LabelPrefix = "X-Micro-Label-"
 )
 
 func NewRouter(opts ...selector.Option) Router {
