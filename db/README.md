@@ -4,6 +4,8 @@ Provides a high level pluggable abstraction for databases.
 
 **This might be removed**
 
+**Don't use this. Run away. RUN AWAY**
+
 ## Interface
 
 Initial thoughts lie around a CRUD interface. The number of times 
@@ -20,7 +22,7 @@ type DB interface {
 	Create(id string, v Record) error
 	Update(id string, v Record) error
 	Delete(id string) error
-	Search(md Metadata) ([]Record, error)
+	Search(md Metadata, limit, offset int64) ([]Record, error)
 	String() string
 }
 
@@ -36,6 +38,7 @@ type Record interface {
 
 ## Supported Databases
 
+- Platform
 - Cassandra
 - MariaDB
 - Elasticsearch
