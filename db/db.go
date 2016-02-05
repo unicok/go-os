@@ -16,6 +16,7 @@ type Metadata map[string]interface{}
 
 type Record interface {
 	Id() string
+	Timestamp() int64
 	Metadata() Metadata
 	Bytes() []byte
 	Scan(v interface{}) error
