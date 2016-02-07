@@ -258,18 +258,36 @@ func (p *platform) run() {
 }
 
 func (p *platform) update(res *registry.Result) {
-	p.Lock()
-	defer p.Unlock()
-
 	if res == nil || res.Service == nil {
 		return
 	}
+
+	p.Lock()
+	defer p.Unlock()
 
 	services, ok := p.cache[res.Service.Name]
 	if !ok {
 		// no service found, let's not go through a convoluted process
 		if (res.Action == "create" || res.Action == "update") && len(res.Service.Version) != 0 {
-			p.cache[res.Service.Name] = []*registry.Service{res.Service}
+			// first lookup, we want to grab everything in case
+			// we missed some events
+			if !p.opts.Discovery {
+				service, err := p.opts.Registry.GetService(res.Service.Name)
+				if err != nil {
+					return
+				}
+				p.cache[res.Service.Name] = service
+				return
+			}
+			rsp, err := p.reg.GetService(context.TODO(), &proto2.GetServiceRequest{Service: res.Service.Name})
+			if err != nil {
+				return
+			}
+			var service []*registry.Service
+			for _, serv := range rsp.Services {
+				service = append(service, toService(serv))
+			}
+			p.cache[res.Service.Name] = service
 		}
 		return
 	}
