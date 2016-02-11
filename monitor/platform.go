@@ -2,6 +2,7 @@ package monitor
 
 import (
 	"errors"
+	"runtime"
 	"sync"
 	"time"
 
@@ -25,6 +26,7 @@ type platform struct {
 	running bool
 	exit    chan bool
 	hc      map[string]HealthChecker
+	stat    *stats
 }
 
 func newPlatform(opts ...Option) Monitor {
@@ -55,6 +57,71 @@ func newPlatform(opts ...Option) Monitor {
 		exit:    make(chan bool, 1),
 		hc:      make(map[string]HealthChecker),
 	}
+}
+
+func (p *platform) stats() {
+	// nothing to diff
+	// defer publishing
+	if p.stat == nil {
+		s := newStats()
+		if s == nil {
+			return
+		}
+		p.stat = s
+		return
+	}
+
+	o := p.stat
+	s := newStats()
+
+	// update
+	p.stat = s
+
+	cpu := &proto.CPU{
+		UserTime:     uint64(s.utime.Nano() - o.utime.Nano()),
+		SystemTime:   uint64(s.stime.Nano() - o.stime.Nano()),
+		VolCtxSwitch: uint64(s.volCtx - o.volCtx),
+		InvCtxSwitch: uint64(s.invCtx - o.invCtx),
+	}
+
+	memory := &proto.Memory{
+		MaxRss: uint64(s.maxRss),
+	}
+
+	disk := &proto.Disk{
+		InBlock: uint64(s.inBlock - o.inBlock),
+		OuBlock: uint64(s.ouBlock - o.ouBlock),
+	}
+
+	rm := runtime.MemStats{}
+	runtime.ReadMemStats(&rm)
+
+	rtime := &proto.Runtime{
+		NumThreads: uint64(runtime.NumGoroutine()),
+		HeapTotal:  rm.HeapAlloc,
+		HeapInUse:  rm.HeapInuse,
+	}
+
+	statsProto := &proto.Stats{
+		Service: &proto.Service{
+			Name:    p.name,
+			Version: p.version,
+			Nodes: []*proto.Node{&proto.Node{
+				Id: p.id,
+			}},
+		},
+		Interval:  int64(p.opts.Interval.Seconds()),
+		Timestamp: time.Now().Unix(),
+		Ttl:       3600,
+		Cpu:       cpu,
+		Memory:    memory,
+		Disk:      disk,
+		Runtime:   rtime,
+		// TODO: add endpoint stats
+	}
+
+	req := p.opts.Client.NewPublication(StatsTopic, statsProto)
+	p.opts.Client.Publish(context.TODO(), req)
 }
 
 func (p *platform) status(status proto.Status_Status) {
@@ -116,6 +183,8 @@ func (p *platform) run() {
 	for {
 		select {
 		case <-t.C:
+			// publish stats
+			p.stats()
 			// publish status
 			p.status(proto.Status_RUNNING)
 			// publish healthchecks
@@ -163,6 +232,11 @@ func (p *platform) HealthChecks() ([]HealthChecker, error) {
 	}
 	p.Unlock()
 	return hcs, nil
+}
+
+func (p *platform) RecordStat(r Request, d time.Duration, err error) {
+	// TODO: implement recording
+	return
 }
 
 func (p *platform) Start() error {

@@ -50,4 +50,50 @@ message Stats {
 	int64 timestamp = 2;
 	int64 interval = 3;
 	int64 ttl = 4;
+	CPU cpu = 5;
+	Memory memory = 6;
+	Disk disk = 7;
+	Runtime runtime = 8;
+	repeated Endpoint endpoints = 9;
+}
+
+message Endpoint {
+	string service = 1;
+	// Name of the endpoint
+	string method = 2;
+	// Success and error rates
+	Metrics errors = 3;
+	Metrics success = 4;
+	Metrics dropped = 5;
+}
+
+message Metrics {
+	int64 count = 1;
+	double mean = 2;
+	double std_dev = 3;
+	double upper95 = 4;
+}
+
+message CPU {
+	uint64 user_time = 1;
+	uint64 system_time = 2;
+	uint64 vol_ctx_switch = 3;
+	uint64 inv_ctx_switch = 4;
+}
+
+message Memory {
+	uint64 max_rss = 1;
+}
+
+message Disk {
+	// blocks read from disk
+	uint64 in_block = 1;
+	// blocks written to disk
+	uint64 ou_block = 2;
+}
+
+message Runtime {
+	uint64 num_threads = 1;
+	uint64 heap_total = 2;
+	uint64 heap_in_use = 3;
 }
