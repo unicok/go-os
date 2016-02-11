@@ -57,6 +57,25 @@ func newPlatform(opts ...Option) Monitor {
 	}
 }
 
+func (p *platform) status(status proto.Status_Status) {
+	statusProto := &proto.Status{
+		Status: status,
+		Service: &proto.Service{
+			Name:    p.name,
+			Version: p.version,
+			Nodes: []*proto.Node{&proto.Node{
+				Id: p.id,
+			}},
+		},
+		Interval:  int64(p.opts.Interval.Seconds()),
+		Timestamp: time.Now().Unix(),
+		Ttl:       3600,
+	}
+
+	req := p.opts.Client.NewPublication(StatusTopic, statusProto)
+	p.opts.Client.Publish(context.TODO(), req)
+}
+
 func (p *platform) update(h HealthChecker) {
 	res, err := h.Run()
 	status := proto.HealthCheck_OK
@@ -70,10 +89,12 @@ func (p *platform) update(h HealthChecker) {
 		Id:          h.Id(),
 		Description: h.Description(),
 		Timestamp:   time.Now().Unix(),
-		Service: &proto.HealthCheck_Service{
+		Service: &proto.Service{
 			Name:    p.name,
 			Version: p.version,
-			Id:      p.id,
+			Nodes: []*proto.Node{&proto.Node{
+				Id: p.id,
+			}},
 		},
 		Interval: int64(p.opts.Interval.Seconds()),
 		Ttl:      3600,
@@ -87,18 +108,27 @@ func (p *platform) update(h HealthChecker) {
 }
 
 func (p *platform) run() {
+	// publish started status
+	p.status(proto.Status_STARTED)
+
 	t := time.NewTicker(p.opts.Interval)
 
 	for {
 		select {
 		case <-t.C:
+			// publish status
+			p.status(proto.Status_RUNNING)
+			// publish healthchecks
 			p.Lock()
 			for _, check := range p.hc {
 				go p.update(check)
 			}
 			p.Unlock()
 		case <-p.exit:
+			// stop the ticker
 			t.Stop()
+			// publish started status
+			p.status(proto.Status_STOPPED)
 			return
 		}
 	}

@@ -41,6 +41,7 @@ type Options struct {
 
 var (
 	HealthCheckTopic = "micro.monitor.healthcheck"
+	StatusTopic      = "micro.monitor.status"
 )
 
 func NewMonitor(opts ...Option) Monitor {

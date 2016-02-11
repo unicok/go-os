@@ -1,17 +1,21 @@
 syntax = "proto3";
 
 
+message Service {
+	string name = 1;
+	string version = 2;
+	repeated Node nodes= 3;
+}
+
+message Node {
+	string id = 1;
+}
+
 message HealthCheck {
 	enum Status {
 		UNKNOWN = 0;
 		OK = 1;
 		ERROR = 2;
-	}
-
-	message Service {
-		string name = 1;
-		string version = 2;
-		string id = 3;
 	}
 
 	string id = 1; // "go.micro.health.check"
@@ -23,4 +27,27 @@ message HealthCheck {
 	Status status = 7;
 	map<string,string> results = 8;
 	string error = 9;
+}
+
+message Status {
+	enum Status {
+		UNKNOWN = 0;
+		STARTED = 1;
+		RUNNING = 2;
+		STOPPED = 3;
+	}
+
+	Service service = 1;
+	Status status = 2;
+	string info = 3;
+	int64 timestamp = 4;
+	int64 interval = 5;
+	int64 ttl = 6;
+}
+
+message Stats {
+	Service service = 1;
+	int64 timestamp = 2;
+	int64 interval = 3;
+	int64 ttl = 4;
 }
