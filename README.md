@@ -45,3 +45,34 @@ The go-platform is a client side interface for the fundamentals of a microservic
 a service which handles that feature. Everything is an interface and pluggable which means you can choose how to 
 architect your platform. Micro however provides a "platform" implementation backed by it's own services by default.
 
+Each package can be used independently or integrated using go-micro client and handler wrappers.
+
+### Auth 
+
+Auth addresses authentication and authorization of services and users. The default implementation is Oauth2 with an additional policy 
+engine coming soon. This is the best way to authenticate users and service to service calls using a centralised 
+authority. Security is a first class citizen in a microservice platform.
+
+### Config 
+
+Config implements an interface for dynamic configuration. The config can be hierarchically loaded and merged from 
+multiple sources e.g file, url, config service. It can and should also be namespaced so that environment specific 
+config is loaded when running in dev, staging or production. The config interface is useful for business level 
+configuration required by your services. It can be reloaded without needing to restart a service.
+
+### DB (experimental) 
+
+The DB interface is an experiment CRUD interface to simplify database access and management. The amount of CRUD boilerplate 
+written and rewritten in a microservice world is immense. By offloading this to a backend service and using RPC, we 
+eliminate much of that and speed up development. The platform implementation includes pluggable backends such as mysql, 
+cassandra, elasticsearch and utilises the registry to lookup which nodes databases are assigned to. 
+
+This is purely experimental at this point based on some ideas from how Google, Facebook and Twitte do database management 
+internally.
+ 
+### Discovery 
+
+Discovery provides a high level service discovery interface on top of the go-micro registry. It utilises the watcher to 
+locally cache service records and also heartbeats to a discovery service. It's akin to the Netflix Eureka 2.0 
+architecture whereby we split the read and write layers of discovery into separate services.
+
