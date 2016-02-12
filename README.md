@@ -13,6 +13,8 @@ much more powerful as a whole.
 
 Further community wide features should be contributed to [go-plugins](https://github.com/micro/go-plugins).
 
+Examples can be found in [go-platform/examples](https://github.com/micro/go-platform/tree/master/examples)
+
 ## Features
 Each package provides a feature interface that will be pluggable and backed by a 
 number of services.
