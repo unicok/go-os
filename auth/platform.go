@@ -23,7 +23,7 @@ type platform struct {
 	exit    chan bool
 }
 
-type authKey struct{}
+type tokenKey struct{}
 
 func newPlatform(opts ...Option) Auth {
 	var options Options
@@ -147,12 +147,12 @@ func (p *platform) Revoke(t *Token) error {
 }
 
 func (p *platform) FromContext(ctx context.Context) (*Token, bool) {
-	t, ok := ctx.Value(authKey{}).(*Token)
+	t, ok := ctx.Value(tokenKey{}).(*Token)
 	return t, ok
 }
 
 func (p *platform) NewContext(ctx context.Context, t *Token) context.Context {
-	return context.WithValue(ctx, authKey{}, t)
+	return context.WithValue(ctx, tokenKey{}, t)
 }
 
 func (p *platform) FromHeader(hd map[string]string) (*Token, bool) {

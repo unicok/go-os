@@ -13,7 +13,7 @@ import (
 	"golang.org/x/net/context"
 )
 
-type traceKey struct{}
+type spanKey struct{}
 
 type platform struct {
 	opts Options
@@ -189,12 +189,12 @@ func (p *platform) NewSpan(s *Span) *Span {
 }
 
 func (p *platform) FromContext(ctx context.Context) (*Span, bool) {
-	s, ok := ctx.Value(traceKey{}).(*Span)
+	s, ok := ctx.Value(spanKey{}).(*Span)
 	return s, ok
 }
 
 func (p *platform) NewContext(ctx context.Context, s *Span) context.Context {
-	return context.WithValue(ctx, traceKey{}, s)
+	return context.WithValue(ctx, spanKey{}, s)
 }
 
 func (p *platform) FromHeader(md map[string]string) (*Span, bool) {
