@@ -54,19 +54,27 @@ func newPlatform(opts ...Option) Trace {
 }
 
 func serviceToProto(s *registry.Service) *proto.Service {
-	if s == nil || len(s.Nodes) == 0 {
+	if s == nil {
 		return nil
 	}
-	return &proto.Service{
-		Name:     s.Name,
-		Version:  s.Version,
-		Metadata: s.Metadata,
-		Nodes: []*proto.Node{&proto.Node{
+
+	var nodes []*proto.Node
+
+	// add node if it exists
+	if len(s.Nodes) > 0 {
+		nodes = []*proto.Node{&proto.Node{
 			Id:       s.Nodes[0].Id,
 			Address:  s.Nodes[0].Address,
 			Port:     int64(s.Nodes[0].Port),
 			Metadata: s.Nodes[0].Metadata,
-		}},
+		}}
+	}
+
+	return &proto.Service{
+		Name:     s.Name,
+		Version:  s.Version,
+		Metadata: s.Metadata,
+		Nodes:    nodes,
 	}
 }
 

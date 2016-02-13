@@ -4,6 +4,7 @@ import (
 	log "github.com/golang/glog"
 	"github.com/micro/go-micro/cmd"
 	"github.com/micro/go-micro/examples/server/handler"
+	"github.com/micro/go-micro/registry"
 	"github.com/micro/go-micro/server"
 
 	"github.com/micro/go-platform/trace"
@@ -19,8 +20,12 @@ func main() {
 		log.Fatal(err)
 	}
 
+	srv := &registry.Service{
+		Name: "go.server",
+	}
+
 	server.DefaultServer = server.NewServer(
-		server.WrapHandler(trace.HandlerWrapper(t, nil)),
+		server.WrapHandler(trace.HandlerWrapper(t, srv)),
 	)
 
 	// Initialise Server

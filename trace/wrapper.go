@@ -46,7 +46,11 @@ func (c *clientWrapper) Call(ctx context.Context, req client.Request, rsp interf
 		})
 		// and mark as debug? might want to do this based on a setting
 		span.Debug = true
+		// set uniq span name
 		span.Name = req.Service() + "." + req.Method()
+		// set source/dest
+		span.Source = c.s
+		span.Destination = &registry.Service{Name: req.Service()}
 	}
 
 	// set context key

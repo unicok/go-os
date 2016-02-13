@@ -6,6 +6,7 @@ import (
 	"github.com/micro/go-micro/cmd"
 	example "github.com/micro/go-micro/examples/server/proto/example"
 	"github.com/micro/go-micro/metadata"
+	"github.com/micro/go-micro/registry"
 	"github.com/micro/go-platform/trace"
 	"golang.org/x/net/context"
 	"time"
@@ -39,9 +40,13 @@ func main() {
 
 	t := trace.NewTrace()
 
+	srv := &registry.Service{
+		Name: "go.client",
+	}
+
 	client.DefaultClient = client.NewClient(
 		client.Wrap(
-			trace.ClientWrapper(t, nil),
+			trace.ClientWrapper(t, srv),
 		),
 	)
 
@@ -52,11 +57,12 @@ func main() {
 	}
 
 	fmt.Println("\n--- Traced Call example ---\n")
-	for i := 0; i < 1; i++ {
+	i := 0
+	for {
 		call(i)
+		i++
+		<-time.After(time.Second * 5)
 	}
-
-	<-time.After(time.Second * 15)
 
 	if err := t.Stop(); err != nil {
 		fmt.Println(err)
