@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+package go.micro.platform.discovery;
+
 message Heartbeat {
 	string id = 1; // The ID of the heartbeat. Will generally be the Node ID. 
 	Service service = 2; // The service sending the heartbeat

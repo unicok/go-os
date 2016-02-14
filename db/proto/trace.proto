@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+package go.micro.platform.db;
+
 message Database {
 	string name = 1;
 	string table = 2;

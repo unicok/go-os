@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+package go.micro.platform.kv;
+
 service KV {
 	rpc Get(GetRequest) returns (GetResponse) {}
 	rpc Put(PutRequest) returns (PutResponse) {}

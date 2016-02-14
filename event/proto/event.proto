@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+package go.micro.platform.event;
+
 message Record {
         string id = 1;
         string type = 2;

@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+package go.micro.platform.log;
+
 message Event {
 	enum Level {
 		DEBUG = 0;

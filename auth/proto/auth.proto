@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+package go.micro.platform.auth;
+
 message Token {
 	string access_token = 1;
 	string token_type = 2;
