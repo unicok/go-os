@@ -8,7 +8,7 @@ import (
 	"github.com/micro/go-micro/client"
 	"github.com/micro/go-micro/metadata"
 
-	"github.com/micro/auth-srv/proto/oauth2"
+	oauth2 "github.com/micro/auth-srv/proto/oauth2"
 	"golang.org/x/net/context"
 )
 

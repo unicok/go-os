@@ -3,7 +3,7 @@ package db
 import (
 	"fmt"
 
-	"github.com/micro/db-srv/proto/db"
+	db "github.com/micro/db-srv/proto/db"
 	"github.com/micro/go-micro/client"
 
 	"golang.org/x/net/context"
