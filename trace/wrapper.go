@@ -26,6 +26,7 @@ func (c *clientWrapper) Call(ctx context.Context, req client.Request, rsp interf
 	md, ok := metadata.FromContext(ctx)
 	if !ok {
 		// this is a new span
+		md = metadata.Metadata{}
 		span = c.t.NewSpan(nil)
 	} else {
 		// can we gt the span from the header?
