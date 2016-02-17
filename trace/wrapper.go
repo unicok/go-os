@@ -37,22 +37,33 @@ func (c *clientWrapper) Call(ctx context.Context, req client.Request, rsp interf
 		}
 	}
 
-	// if we are the creator
-	if !okk {
-		// start the span
-		span.Annotations = append(span.Annotations, &Annotation{
-			Timestamp: time.Now(),
-			Type:      AnnStart,
-			Service:   c.s,
+	// got parent span
+	if okk {
+		// setup the span with parent
+		span = c.t.NewSpan(&Span{
+			// same trace id
+			TraceId: span.TraceId,
+			// set parent id to parent span id
+			ParentId: span.Id,
+			// use previous debug
+			Debug: span.Debug,
 		})
-		// and mark as debug? might want to do this based on a setting
-		span.Debug = true
-		// set uniq span name
-		span.Name = req.Service() + "." + req.Method()
-		// set source/dest
-		span.Source = c.s
-		span.Destination = &registry.Service{Name: req.Service()}
 	}
+
+	// start the span
+	span.Annotations = append(span.Annotations, &Annotation{
+		Timestamp: time.Now(),
+		Type:      AnnStart,
+		Service:   c.s,
+	})
+
+	// and mark as debug? might want to do this based on a setting
+	span.Debug = true
+	// set uniq span name
+	span.Name = req.Service() + "." + req.Method()
+	// set source/dest
+	span.Source = c.s
+	span.Destination = &registry.Service{Name: req.Service()}
 
 	// set context key
 	newCtx := c.t.NewContext(ctx, span)
@@ -76,20 +87,20 @@ func (c *clientWrapper) Call(ctx context.Context, req client.Request, rsp interf
 		})
 
 		// if we were the creator
-		if !okk {
-			var debug map[string]string
-			if err != nil {
-				debug = map[string]string{"error": err.Error()}
-			}
-			// mark end of span
-			span.Annotations = append(span.Annotations, &Annotation{
-				Timestamp: time.Now(),
-				Type:      AnnEnd,
-				Service:   c.s,
-				Debug:     debug,
-			})
-			span.Duration = time.Now().Sub(span.Timestamp)
+		var debug map[string]string
+		if err != nil {
+			debug = map[string]string{"error": err.Error()}
 		}
+		// mark end of span
+		span.Annotations = append(span.Annotations, &Annotation{
+			Timestamp: time.Now(),
+			Type:      AnnEnd,
+			Service:   c.s,
+			Debug:     debug,
+		})
+
+		span.Duration = time.Now().Sub(span.Timestamp)
+
 		// flush the span to the collector on return
 		c.t.Collect(span)
 	}()
@@ -121,6 +132,7 @@ func handlerWrapper(fn server.HandlerFunc, t Trace, s *registry.Service) server.
 				// no, ok create one
 				span = t.NewSpan(nil)
 			}
+			span.Timestamp = time.Time{}
 			span.Debug = true
 		}
 

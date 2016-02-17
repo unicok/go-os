@@ -170,22 +170,26 @@ func (p *platform) NewSpan(s *Span) *Span {
 	}
 
 	// existing trace in theory
+	cp := &Span{}
+	*cp = *s
 
 	if len(s.TraceId) == 0 {
-		s.TraceId = uuid.NewUUID().String()
+		cp.TraceId = uuid.NewUUID().String()
 	}
 	if len(s.ParentId) == 0 {
-		s.ParentId = "0"
+		cp.ParentId = "0"
 	}
 	if len(s.Id) == 0 {
-		s.Id = uuid.NewUUID().String()
+		cp.Id = uuid.NewUUID().String()
+	}
+	if s.Timestamp.IsZero() {
+		cp.Timestamp = time.Now()
+	}
+	if s.Source == nil {
+		cp.Source = p.opts.Service
 	}
 
-	return &Span{
-		Id:       s.Id,
-		TraceId:  s.TraceId,
-		ParentId: s.ParentId,
-	}
+	return cp
 }
 
 func (p *platform) FromContext(ctx context.Context) (*Span, bool) {
