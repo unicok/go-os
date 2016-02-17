@@ -101,6 +101,9 @@ func (c *clientWrapper) Call(ctx context.Context, req client.Request, rsp interf
 
 func handlerWrapper(fn server.HandlerFunc, t Trace, s *registry.Service) server.HandlerFunc {
 	return func(ctx context.Context, req server.Request, rsp interface{}) error {
+		// embed trace instance
+		newCtx := NewContext(ctx, t)
+
 		var span *Span
 		var err error
 
@@ -121,7 +124,7 @@ func handlerWrapper(fn server.HandlerFunc, t Trace, s *registry.Service) server.
 			span.Debug = true
 		}
 
-		newCtx := t.NewContext(ctx, span)
+		newCtx = t.NewContext(newCtx, span)
 
 		// mark client request
 		span.Annotations = append(span.Annotations, &Annotation{
