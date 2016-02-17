@@ -18,27 +18,38 @@ type clientWrapper struct {
 
 func (c *clientWrapper) Call(ctx context.Context, req client.Request, rsp interface{}, opts ...client.CallOption) error {
 	var span *Span
-	var okk bool
+	var ok, okk bool
 	var err error
+	md := metadata.Metadata{}
 
-	// Expectation is that we're the initiator of tracing
-	// So get trace info from metadata
-	md, ok := metadata.FromContext(ctx)
+	// try pull span from context
+	span, ok = c.t.FromContext(ctx)
 	if !ok {
-		// this is a new span
-		md = metadata.Metadata{}
-		span = c.t.NewSpan(nil)
-	} else {
-		// can we gt the span from the header?
-		span, okk = c.t.FromHeader(md)
-		if !okk {
-			// no, ok create one
+		// couldn't do that, try from the metadata
+
+		// So get trace info from metadata
+		var kk bool
+		md, kk = metadata.FromContext(ctx)
+		if !kk {
+			// couldn't do that either
+
+			// so this is a new span!
+			md = metadata.Metadata{}
 			span = c.t.NewSpan(nil)
+		} else {
+			// ok we got some md
+
+			// can we get the span from the header?
+			span, okk = c.t.FromHeader(md)
+			if !okk {
+				// no, ok create one!
+				span = c.t.NewSpan(nil)
+			}
 		}
 	}
 
-	// got parent span
-	if okk {
+	// got parent span from context or metadata
+	if okk || ok {
 		// setup the span with parent
 		span = c.t.NewSpan(&Span{
 			// same trace id
@@ -136,14 +147,15 @@ func handlerWrapper(fn server.HandlerFunc, t Trace, s *registry.Service) server.
 			span.Debug = true
 		}
 
-		newCtx = t.NewContext(newCtx, span)
-
 		// mark client request
 		span.Annotations = append(span.Annotations, &Annotation{
 			Timestamp: time.Now(),
 			Type:      AnnServerRequest,
 			Service:   s,
 		})
+
+		// embed the span in the context
+		newCtx = t.NewContext(newCtx, span)
 
 		// defer the completion of the span
 		defer func() {
