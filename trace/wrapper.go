@@ -129,13 +129,11 @@ func handlerWrapper(fn server.HandlerFunc, t Trace, s *registry.Service) server.
 		var span *Span
 		var err error
 
-		// Expectation is that we're the initiator of tracing
-		// So get trace info from metadata
+		// get trace info from metadata
 		md, ok := metadata.FromContext(ctx)
 		if !ok {
 			// this is a new span
 			span = t.NewSpan(nil)
-			span.Debug = true
 		} else {
 			// can we gt the span from the header?
 			span, ok = t.FromHeader(md)
@@ -143,8 +141,6 @@ func handlerWrapper(fn server.HandlerFunc, t Trace, s *registry.Service) server.
 				// no, ok create one
 				span = t.NewSpan(nil)
 			}
-			span.Timestamp = time.Time{}
-			span.Debug = true
 		}
 
 		// mark client request
@@ -153,6 +149,14 @@ func handlerWrapper(fn server.HandlerFunc, t Trace, s *registry.Service) server.
 			Type:      AnnServerRequest,
 			Service:   s,
 		})
+
+		// and mark as debug? might want to do this based on a setting
+		span.Debug = true
+		// set unique span name
+		span.Name = req.Service() + "." + req.Method()
+		// set source/dest
+		span.Source = s
+		span.Destination = &registry.Service{Name: req.Service()}
 
 		// embed the span in the context
 		newCtx = t.NewContext(newCtx, span)
@@ -170,6 +174,9 @@ func handlerWrapper(fn server.HandlerFunc, t Trace, s *registry.Service) server.
 				Service:   s,
 				Debug:     debug,
 			})
+
+			span.Duration = time.Now().Sub(span.Timestamp)
+
 			// flush the span to the collector on return
 			t.Collect(span)
 		}()
