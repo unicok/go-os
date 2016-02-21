@@ -32,3 +32,9 @@ func Servers(s []string) Option {
 		o.Servers = s
 	}
 }
+
+func Namespace(ns string) Option {
+	return func(o *Options) {
+		o.Namespace = ns
+	}
+}
