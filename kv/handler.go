@@ -33,7 +33,16 @@ func (k *kv) Get(ctx context.Context, req *proto.GetRequest, rsp *proto.GetRespo
 		return errors.NotFound(serviceName, "not found")
 	}
 
+	// non expiring key
+	if item.Expiration <= 0 {
+		rsp.Item = item.Item
+		return nil
+	}
+
+	// expiring key
+
 	t := time.Now().Unix()
+
 	if delta := t - item.Timestamp; delta > item.Expiration {
 		// not yet reaped but you can't have it either
 		return errors.NotFound(serviceName, "not found")
