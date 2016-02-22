@@ -145,6 +145,11 @@ func (p *platform) reap() {
 	mtx.Lock()
 
 	for key, item := range items {
+		// don't expire zero or less
+		if item.Expiration <= 0 {
+			continue
+		}
+
 		// Delta greater than expiration
 		if delta := t - item.Timestamp; delta > item.Expiration {
 			delete(items, key)
