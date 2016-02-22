@@ -38,3 +38,15 @@ func Namespace(ns string) Option {
 		o.Namespace = ns
 	}
 }
+
+func Client(c client.Client) Option {
+	return func(o *Options) {
+		o.Client = c
+	}
+}
+
+func Server(s server.Server) Option {
+	return func(o *Options) {
+		o.Server = s
+	}
+}
