@@ -45,6 +45,12 @@ type Auth interface {
 	// We cache policies locally from the auth server
 	Start() error
 	Stop() error
+	// Name
+	String() string
+}
+
+func NewAuth(opts ...Option) Auth {
+	return newPlatform(opts...)
 }
 ```
 

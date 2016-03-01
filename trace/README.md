@@ -22,11 +22,41 @@ type Trace interface {
 	Start() error
 	// Stop the collector
 	Stop() error
+	// Name
+	String() string
+}
+
+type Span struct {
+	Name      string        // Topic / RPC Method
+	Id        string        // id of this span
+	TraceId   string        // The root trace id
+	ParentId  string        // Parent span id
+	Timestamp time.Time     // Microseconds from epoch. When span started.
+	Duration  time.Duration // Microseconds. Duration of the span.
+	Debug     bool          // Should persist no matter what.
+
+	Source      *registry.Service // Originating service
+	Destination *registry.Service // Destination service
+
+	sync.Mutex
+	Annotations []*Annotation
+}
+
+type Annotation struct {
+	Timestamp time.Time // Microseconds from epoch
+	Type      AnnotationType
+	Key       string
+	Value     []byte
+	Debug     map[string]string
+	Service   *registry.Service // Annotator
+}
+
+func NewTrace(opts ...Option) Trace {
+	return newPlatform(opts...)
 }
 ```
 
 ## Supported
 
-- Platform
+- Trace service
 - Zipkin
-- ?

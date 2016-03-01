@@ -6,7 +6,7 @@ By default we support the telegraf/statsd interface which supports influxdb labe
 
 ## Interface
 
-```
+```go
 type Fields map[string]string
 
 // Metrics provides a way to instrument application data
@@ -52,6 +52,6 @@ type Histogram interface {
 }
 ```
 
-## Supported Metric stores
+## Supported Backends
 
 - Telegraf/StatsD

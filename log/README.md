@@ -60,11 +60,12 @@ type Output interface {
 	// Name of output
 	String() string
 }
+
+func NewLog(opts ...Option) Log {
+	return newPlatform(opts...)
+}
 ```
 
-## Supported Log stores
+## Supported Backends
 
-- ELK
-- Fluentd
-- Syslog
-- ?
+- File

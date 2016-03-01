@@ -43,3 +43,7 @@ type Elected interface {
         Resign() error
 }
 ```
+
+## Supported Backends
+
+- Consul

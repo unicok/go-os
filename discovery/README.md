@@ -10,7 +10,7 @@ cache registry info locally, heartbeat and remove nodes when they stop beating.
 Should also understand where there's massive failure and prevent deleting the 
 cache.
 
-```
+```go
 // Discovery builds on the registry as a mechanism
 // for finding services. It includes heartbeating
 // to notify of liveness and caching of the registry.
@@ -22,9 +22,13 @@ type Discovery interface {
 	// stops the watcher, caching and hearbeating
 	Stop() error
 }
+
+func NewDiscovery(opts ...Option) Discovery {
+	return newPlatform(opts...)
+}
 ```
 
 ## Supported Backends
 
 - Micro registry (any plugins; consul, etcd, memory)
-- Platform
+- Discovery service

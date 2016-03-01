@@ -9,12 +9,14 @@ By tracking platform events we can essentially build a platform event correlatio
 ```go
 type Event interface {
 	// publish an event record
-	Publish(*Record) error
+	Publish(context.Context, *Record) error
 	// subscribe to an event types
-	Subscribe(Handler, ...string) error
+	Subscribe(context.Context, Handler, ...string) error
 	// used for internal purposes
 	Start() error
 	Stop() error
+	// Name
+	String() string
 }
 
 type Record struct {
@@ -27,5 +29,10 @@ type Record struct {
 	Data      string
 }
 
-type Handler func(*Record)
+func NewEvent(opts ...Option) Event {
+	return newPlatform(opts...)
+}
 ```
+
+## Supported Backends
+- Event service

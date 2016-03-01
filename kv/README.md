@@ -9,6 +9,14 @@ type KV interface {
 	Get(key string) (*Item, error)
 	Del(key string) error
 	Put(item *Item) error
+
+	// Runtime. Could be used for internal reaping
+	// of expired keys or publishing info, gossip,
+	// etc
+	Start() error
+	Stop() error
+	// Name
+	String() string
 }
 
 type Item struct {
@@ -16,10 +24,14 @@ type Item struct {
 	Value      []byte
 	Expiration time.Duration
 }
+
+func NewKV(opts ...Option) KV {
+	return newPlatform(opts...)
+}
 ```
 
-## Supported KV Stores
+## Supported Backends
 
-- Platform
+- Gossip
 - Memcached
 - Redis
