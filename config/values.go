@@ -123,7 +123,12 @@ func (j *jsonValue) Scan(v interface{}) error {
 func (j *jsonValue) Bytes() []byte {
 	b, err := j.Json.Bytes()
 	if err != nil {
-		return []byte{}
+		// try return marshalled
+		b, err = j.Json.MarshalJSON()
+		if err != nil {
+			return []byte{}
+		}
+		return b
 	}
 	return b
 }
