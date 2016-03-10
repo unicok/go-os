@@ -5,7 +5,6 @@ import (
 	"github.com/micro/go-micro/client"
 	"github.com/micro/go-micro/cmd"
 	example "github.com/micro/go-micro/examples/server/proto/example"
-	"github.com/micro/go-micro/metadata"
 	"github.com/micro/go-micro/registry"
 	"github.com/micro/go-platform/trace"
 	"golang.org/x/net/context"
@@ -14,25 +13,19 @@ import (
 
 func call(i int) {
 	// Create new request to service go.micro.srv.example, method Example.Call
-	req := client.NewRequest("go.micro.srv.example", "Example.Call", &example.Request{
-		Name: "John",
+	req := client.NewRequest("go.micro.srv.example", "Ping.Pong", &example.Ping{
+		Stroke: 10,
 	})
 
-	// create context with metadata
-	ctx := metadata.NewContext(context.Background(), map[string]string{
-		"X-User-Id": "john",
-		"X-From-Id": "script",
-	})
-
-	rsp := &example.Response{}
+	rsp := &example.Pong{}
 
 	// Call service
-	if err := client.Call(ctx, req, rsp); err != nil {
+	if err := client.Call(context.TODO(), req, rsp); err != nil {
 		fmt.Println("call err: ", err, rsp)
 		return
 	}
 
-	fmt.Println("Call:", i, "rsp:", rsp.Msg)
+	fmt.Println("Call:", i, "rsp:", rsp.Stroke)
 }
 
 func main() {
@@ -41,7 +34,7 @@ func main() {
 	t := trace.NewTrace()
 
 	srv := &registry.Service{
-		Name: "go.client",
+		Name: "go.micro.client.example",
 	}
 
 	client.DefaultClient = client.NewClient(
