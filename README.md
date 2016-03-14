@@ -1,4 +1,4 @@
-# Go Platform [![GoDoc](https://godoc.org/github.com/micro/go-platform?status.svg)](https://godoc.org/github.com/micro/go-platform) [![Travis CI](https://travis-ci.org/micro/go-platform.svg?branch=master)](https://travis-ci.org/micro/go-platform)
+# Go Platform [![GoDoc](https://godoc.org/github.com/micro/go-platform?status.svg)](https://godoc.org/github.com/micro/go-platform) [![Travis CI](https://travis-ci.org/micro/go-platform.svg?branch=master)](https://travis-ci.org/micro/go-platform) [![Go Report Card](https://goreportcard.com/badge/micro/go-platform)](https://goreportcard.com/report/github.com/micro/go-platform)
 
 This is a microservice platform library built to be used with micro/go-micro. 
 It provides all of the fundamental tooling required to run and manage 
