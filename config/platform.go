@@ -1,10 +1,10 @@
 package config
 
 import (
+	"log"
 	"sync"
 	"time"
 
-	log "github.com/golang/glog"
 	"github.com/micro/go-micro/client"
 )
 
@@ -70,7 +70,7 @@ func (p *platform) loaded() bool {
 // sync loads all the sources, calls the parser and updates the config
 func (p *platform) sync() {
 	if len(p.opts.Sources) == 0 {
-		log.Errorf("Zero sources available to sync")
+		log.Printf("Zero sources available to sync")
 		return
 	}
 
@@ -89,10 +89,10 @@ func (p *platform) sync() {
 			// if we have no config, we're going to try
 			// load something
 			if vals == nil {
-				log.Errorf("Failed to load a source %v but current config is empty so continuing", err)
+				log.Printf("Failed to load a source %v but current config is empty so continuing", err)
 				continue
 			} else {
-				log.Errorf("Failed to load a source %v backing off", err)
+				log.Printf("Failed to load a source %v backing off", err)
 				return
 			}
 		}
@@ -101,7 +101,7 @@ func (p *platform) sync() {
 
 	set, err := p.opts.Reader.Parse(sets...)
 	if err != nil {
-		log.Errorf("Failed to parse ChangeSets %v", err)
+		log.Printf("Failed to parse ChangeSets %v", err)
 		return
 	}
 
@@ -129,7 +129,7 @@ func (p *platform) Get(path ...string) Value {
 	// we are truly screwed, trying to load in a hacked way
 	v, err := p.opts.Reader.Values(ch)
 	if err != nil {
-		log.Errorf("Failed to read values %v trying again", err)
+		log.Printf("Failed to read values %v trying again", err)
 		// man we're so screwed
 		// Let's try hack this
 		// We should really be better
