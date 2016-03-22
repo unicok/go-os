@@ -2,6 +2,7 @@ package config
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"time"
 
@@ -47,6 +48,9 @@ func (j *jsonReader) Parse(changes ...*ChangeSet) (*ChangeSet, error) {
 }
 
 func (j *jsonReader) Values(ch *ChangeSet) (Values, error) {
+	if ch == nil {
+		return nil, errors.New("changeset is nil")
+	}
 	return newValues(ch)
 }
 

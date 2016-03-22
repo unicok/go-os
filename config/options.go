@@ -19,6 +19,7 @@ type SourceOptions struct {
 
 	// Client for platform
 	Client client.Client
+	Hosts  []string
 }
 
 // PollInterval is the time interval at which the sources are polled
@@ -66,5 +67,11 @@ func SourceName(n string) SourceOption {
 func SourceClient(c client.Client) SourceOption {
 	return func(o *SourceOptions) {
 		o.Client = c
+	}
+}
+
+func SourceHosts(hosts ...string) SourceOption {
+	return func(o *SourceOptions) {
+		o.Hosts = hosts
 	}
 }
