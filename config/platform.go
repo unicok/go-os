@@ -1,6 +1,8 @@
 package config
 
 import (
+	"bytes"
+	"errors"
 	"log"
 	"sync"
 	"time"
@@ -12,11 +14,22 @@ type platform struct {
 	opts Options
 
 	sync.RWMutex
+
 	cset *ChangeSet
 	vals Values
 
 	running bool
 	exit    chan bool
+
+	idx      int
+	watchers map[int]*watcher
+}
+
+type watcher struct {
+	exit    chan bool
+	path    []string
+	value   Value
+	updates chan Value
 }
 
 func newPlatform(opts ...Option) Config {
@@ -39,7 +52,8 @@ func newPlatform(opts ...Option) Config {
 	}
 
 	return &platform{
-		opts: options,
+		opts:     options,
+		watchers: make(map[int]*watcher),
 	}
 }
 
@@ -65,6 +79,23 @@ func (p *platform) loaded() bool {
 	}
 	p.RUnlock()
 	return loaded
+}
+
+func (p *platform) update() {
+	var watchers []*watcher
+
+	p.RLock()
+	for _, w := range p.watchers {
+		watchers = append(watchers, w)
+	}
+	p.RUnlock()
+
+	for _, w := range watchers {
+		select {
+		case w.updates <- p.vals.Get(w.path...):
+		default:
+		}
+	}
 }
 
 // sync loads all the sources, calls the parser and updates the config
@@ -109,6 +140,8 @@ func (p *platform) sync() {
 	p.vals, _ = p.opts.Reader.Values(set)
 	p.cset = set
 	p.Unlock()
+
+	p.update()
 }
 
 func (p *platform) Get(path ...string) Value {
@@ -227,4 +260,56 @@ func (p *platform) Stop() error {
 
 func (p *platform) String() string {
 	return "platform"
+}
+
+func (p *platform) Watch(path ...string) (Watcher, error) {
+	value := p.Get(path...)
+
+	p.Lock()
+
+	w := &watcher{
+		exit:    make(chan bool),
+		path:    path,
+		value:   value,
+		updates: make(chan Value, 1),
+	}
+
+	id := p.idx
+	p.watchers[id] = w
+	p.idx++
+
+	p.Unlock()
+
+	go func() {
+		<-w.exit
+		p.Lock()
+		delete(p.watchers, id)
+		p.Unlock()
+	}()
+
+	return w, nil
+}
+
+func (w *watcher) Next() (Value, error) {
+	for {
+		select {
+		case <-w.exit:
+			return nil, errors.New("watcher stopped")
+		case v := <-w.updates:
+			if bytes.Equal(w.value.Bytes(), v.Bytes()) {
+				continue
+			}
+			w.value = v
+			return v, nil
+		}
+	}
+}
+
+func (w *watcher) Stop() error {
+	select {
+	case <-w.exit:
+	default:
+		close(w.exit)
+	}
+	return nil
 }

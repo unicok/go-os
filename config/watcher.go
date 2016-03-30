@@ -6,11 +6,11 @@ import (
 	proto "github.com/micro/config-srv/proto/config"
 )
 
-type watcher struct {
+type sourceWatcher struct {
 	w proto.Config_WatchClient
 }
 
-func (w *watcher) Next() (*ChangeSet, error) {
+func (w *sourceWatcher) Next() (*ChangeSet, error) {
 	c, err := w.w.Recv()
 	if err != nil {
 		return nil, err
@@ -23,6 +23,6 @@ func (w *watcher) Next() (*ChangeSet, error) {
 	}, nil
 }
 
-func (w *watcher) Stop() error {
+func (w *sourceWatcher) Stop() error {
 	return w.w.Close()
 }

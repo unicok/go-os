@@ -40,7 +40,7 @@ func (s *source) Watch() (SourceWatcher, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &watcher{stream}, nil
+	return &sourceWatcher{stream}, nil
 }
 
 func NewSource(opts ...SourceOption) Source {

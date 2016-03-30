@@ -24,6 +24,36 @@ func removeFile() error {
 	return os.Remove(configFile)
 }
 
+func watch(c config.Config, key ...string) {
+	fmt.Println("Subscribing to changes for", key)
+
+	w, err := c.Watch(key...)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	go func() {
+		for {
+			v, err := w.Next()
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+			fmt.Println("Received value for key:", v.String("default"))
+		}
+	}()
+
+	for i := 0; i < 10; i++ {
+		fmt.Println("Writing change to file")
+		writeFile(i + 1)
+		time.Sleep(time.Second)
+	}
+
+	fmt.Println("Stopping subscriber")
+	w.Stop()
+}
+
 func main() {
 	flag.Parse()
 
@@ -54,6 +84,12 @@ func main() {
 		writeFile(i + 1)
 		time.Sleep(time.Second)
 	}
+
+	// watch key that exists
+	watch(config, "key")
+
+	// watch key that does not exist
+	watch(config, "foo")
 
 	fmt.Println("Stopping config runner")
 

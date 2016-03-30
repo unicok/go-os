@@ -12,6 +12,8 @@ type Config interface {
 	Values
 	// Config options
 	Options() Options
+	// Watch for changes
+	Watch(path ...string) (Watcher, error)
 	// Start/Stop for internal interval updater, etc.
 	Start() error
 	Stop() error
@@ -56,6 +58,11 @@ type Source interface {
 	Watch() (SourceWatcher, error)
 	// Name of source
 	String() string
+}
+
+type Watcher interface {
+	Next() (Value, error)
+	Stop() error
 }
 
 // SourceWatcher allows you to watch a source for changes
