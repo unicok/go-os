@@ -27,8 +27,19 @@ func (c *clientWrapper) Call(ctx context.Context, req client.Request, rsp interf
 	// create new context with token
 	newCtx := c.a.NewContext(ctx, t)
 
+	// get metadata
+	md, ok := metadata.FromContext(newCtx)
+	if !ok {
+		md = metadata.Metadata{}
+	}
+
+	// set auth headers
+	for k, v := range c.a.NewHeader(map[string]string{}, t) {
+		md[k] = v
+	}
+
 	// set metadata
-	newCtx = metadata.NewContext(newCtx, c.a.NewHeader(map[string]string{}, t))
+	newCtx = metadata.NewContext(newCtx, md)
 
 	// circuit break, check authorization here
 	t, err = c.a.Authorized(newCtx, req)
