@@ -2,13 +2,19 @@
 
 Provides a high level pluggable abstraction for discovery.
 
+Building on ideas from [Eureka 2.0](https://github.com/Netflix/eureka/wiki/Eureka-2.0-Architecture-Overview)
+
 ## Interface
 
-While the registry provides service and node information it does not include 
-heartbeating or fault tolerant behaviour. Discovery should do both. It should 
-cache registry info locally, heartbeat and remove nodes when they stop beating. 
-Should also understand where there's massive failure and prevent deleting the 
-cache.
+The go-micro registry provides a simplistic manner of heartbeating through re-registration, 
+we want to provide heartbeating as an actual type of interaction at the discovery level. 
+Discovery will provide heartbeating as a published events so anything can subscribe to 
+the heartbeats. It also includes an in-memory client side cache of the registry using 
+the registry Watcher. The default registry does not cache and so is limited by the 
+scalabilty of the service discovery mechanism chosen. 
+
+In the future it will also understand massive failure based on network events and stop 
+from deleting the registry cache.
 
 ```go
 // Discovery builds on the registry as a mechanism
