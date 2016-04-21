@@ -1,5 +1,13 @@
 # Monitor
 
+Provides a high level pluggable abstraction for monitoring. 
+
+## Interface
+
+Allows the ability for user defined healthchecks. Exactly what's required for monitoring 
+business logic as opposed to lower level things like pings, tcp checks, etc. Also 
+collates stats about the service and periodically publishes.
+
 ```go
 // The monitor aggregates, observes and publishes
 // information about the current process.
