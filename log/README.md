@@ -4,7 +4,8 @@ Provides a high level abstraction for centralised logging.
 
 ## Interface
 
-Potentially offload this to [logrus](https://github.com/Sirupsen/logrus)
+This is an interface for structured logging. It provides a simple way of creating 
+logs messages with metadata with the ability to send to multiple outputs. 
 
 ```go
 // A structure log interface which can
