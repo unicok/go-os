@@ -1,6 +1,8 @@
 # DB - database interface
 
-DB is a high level pluggable abstraction for databases. The motivation is to create a DBaaS layer that 
+DB is a high level pluggable abstraction for databases. 
+
+The motivation is to create a DBaaS layer that 
 allows RPC based proxying so that we can leverage go-micro and all the plugins. This allows auth, 
 rate limiting, tracing and all the other things to be used. What we lose in database drivers we gain 
 in not having to write CRUD a thousand times over.
