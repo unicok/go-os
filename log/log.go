@@ -1,5 +1,9 @@
 package log
 
+import (
+	"encoding/json"
+)
+
 const (
 	DebugLevel Level = 0
 	InfoLevel  Level = 1
@@ -71,10 +75,31 @@ type Option func(o *Options)
 type OutputOption func(o *OutputOptions)
 
 var (
-	DefaultLevel Level = InfoLevel
+	DefaultLevel      Level = InfoLevel
+	DefaultOutputName       = "log.json"
 
-	DefaultOutputName = "log.json"
+	Levels = map[Level]string{
+		DebugLevel: "debug",
+		InfoLevel:  "info",
+		WarnLevel:  "warn",
+		ErrorLevel: "error",
+		FatalLevel: "fatal",
+	}
 )
+
+func (e *Event) MarshalJSON() ([]byte, error) {
+	return json.Marshal(struct {
+		Level     string `json:"level"`
+		Fields    Fields `json:"fields"`
+		Message   string `json:"message"`
+		Timestamp int64  `json:"timestamp"`
+	}{
+		Level:     Levels[e.Level],
+		Fields:    e.Fields,
+		Message:   e.Message,
+		Timestamp: e.Timestamp,
+	})
+}
 
 func NewLog(opts ...Option) Log {
 	return newPlatform(opts...)
