@@ -159,9 +159,27 @@ func (p *platform) reap() {
 }
 
 func (p *platform) run(exit chan bool) {
+	// immediately add self to ring
+	for i := 0; i < 10; i++ {
+		// wait till there's a valid address from the server
+		if p := strings.Split(p.address(), ":"); len(p) < 2 {
+			time.Sleep(GossipEvent / 100.0)
+			continue
+		}
+		// have a valid address, setup, now
+		p.subscriber(context.Background(), &Announcement{
+			Namespace: p.opts.Namespace,
+			Address:   p.address(),
+			Timestamp: time.Now().Unix(),
+		})
+		break
+	}
+
+	// setup the ticker
 	t := time.NewTicker(GossipEvent)
 	r := time.NewTicker(ReaperEvent)
 
+	// now lets go!
 	for {
 		select {
 		case <-t.C:
