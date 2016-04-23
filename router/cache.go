@@ -42,7 +42,7 @@ func newCache(services []*registry.Service, expires int64) *cache {
 	return cache
 }
 
-func (c *cache) Filter(filters []selector.SelectFilter) (selector.Next, error) {
+func (c *cache) Filter(filters []selector.Filter) (selector.Next, error) {
 	services := c.services
 
 	for _, filter := range filters {

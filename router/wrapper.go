@@ -66,7 +66,7 @@ func (l *labelWrapper) Call(ctx context.Context, req client.Request, rsp interfa
 	}
 
 	callOptions := append(opts, client.WithSelectOption(
-		selector.Filter(filter),
+		selector.WithFilter(filter),
 	))
 
 	return l.Client.Call(ctx, req, rsp, callOptions...)
