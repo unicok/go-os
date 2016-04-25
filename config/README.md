@@ -60,4 +60,5 @@ func NewConfig(opts ...Option) Config {
 ## Supported Backends
 
 - Config service
+- Consul
 - File
