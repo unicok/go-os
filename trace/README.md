@@ -60,3 +60,31 @@ func NewTrace(opts ...Option) Trace {
 
 - Trace service
 - Zipkin
+
+## Usage
+
+You can either manually use the Trace interface to create and collect spans - look at the [wrappers](https://github.com/micro/go-platform/blob/master/trace/wrapper.go) 
+for an example - or use the client and server wrappers which will be called on every request made or received.
+
+Also check out [go-platform/examples/trace](https://github.com/micro/go-platform/tree/master/examples/trace).
+
+```
+import (
+	"github.com/micro/go-micro"
+	"github.com/micro/go-micro/registry"
+	"github.com/micro/go-platform/trace"
+)
+
+func main() {
+	t := trace.NewTrace()
+
+	srv := &registry.Service{Name: "go.micro.srv.example"}
+
+	service := micro.NewService(
+		micro.Name("go.micro.srv.example"),
+		micro.WrapClient(trace.ClientWrapper(t, srv)),
+		micro.WrapHandler(trace.HandlerWrapper(t, srv)),
+	)
+}
+```
+
