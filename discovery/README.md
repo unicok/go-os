@@ -22,6 +22,9 @@ of the environment. Integration still requires some work.
 In the future it will also understand massive failure based on network events and stop 
 from deleting the registry cache.
 
+The platform implementation is backed by a discovery service which acts as a read layer and builds on 
+the Netflix Eureka 2.0 model.
+
 ```go
 // Discovery builds on the registry as a mechanism
 // for finding services. It includes heartbeating
