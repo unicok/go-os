@@ -6,12 +6,18 @@ Building on ideas from [Eureka 2.0](https://github.com/Netflix/eureka/wiki/Eurek
 
 ## Interface
 
-The go-micro registry provides a simplistic manner of heartbeating through re-registration, 
-we want to provide heartbeating as an actual type of interaction at the discovery level. 
-Discovery will provide heartbeating as a published events so anything can subscribe to 
-the heartbeats. It also includes an in-memory client side cache of the registry using 
-the registry Watcher. The default registry does not cache and so is limited by the 
-scalabilty of the service discovery mechanism chosen. 
+The go-micro registry provides a simple Registry abstraction for various service discovery systems. 
+"Heartbeating" is also done through a simple form of re-registration. Because of this we end up 
+with a system that has limited scaling potential and does not provide much information about 
+service health.
+
+Discovery provides heartbeating as events published via the Broker. This means anyone can subscribe 
+to the heartbeats to determine "liveness" rather than querying the Registry. Discovery also 
+includes an in-memory cache of the Registry using the Watcher. If the Registry fails for any 
+reason Discovery continues to function.
+
+It can be used to augment the Registry behaviour in a go-micro service and provide a better view 
+of the environment. Integration still requires some work.
 
 In the future it will also understand massive failure based on network events and stop 
 from deleting the registry cache.
