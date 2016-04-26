@@ -81,7 +81,6 @@ func newPlatform(opts ...Option) KV {
 	)
 
 	go p.run()
-
 	return p
 }
 

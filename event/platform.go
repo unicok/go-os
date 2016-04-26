@@ -13,8 +13,7 @@ import (
 
 type platform struct {
 	opts Options
-
-	cl ev.EventClient
+	cl   ev.EventClient
 }
 
 func newPlatform(opts ...Option) Event {

@@ -19,11 +19,11 @@ var (
 )
 
 type platform struct {
+	exit              chan bool
 	opts              Options
 	name, version, id string
 
 	sync.Mutex
-	exit chan bool
 	hc   map[string]HealthChecker
 	stat *stats
 }
@@ -53,12 +53,11 @@ func newPlatform(opts ...Option) Monitor {
 		version: c.Version,
 		id:      c.Id,
 		opts:    opt,
-		exit:    make(chan bool, 1),
+		exit:    make(chan bool),
 		hc:      make(map[string]HealthChecker),
 	}
 
 	go p.run()
-
 	return p
 }
 

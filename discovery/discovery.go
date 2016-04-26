@@ -16,10 +16,8 @@ const (
 // for finding services. It includes heartbeating
 // to notify of liveness and caching of the registry.
 type Discovery interface {
-	// implements the registry interface
-	registry.Registry
-	// Render discovery unusable
 	Close() error
+	registry.Registry
 }
 
 type Options struct {

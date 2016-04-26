@@ -11,14 +11,12 @@ import (
 )
 
 type platform struct {
+	exit chan bool
 	opts Options
 
 	sync.RWMutex
-
 	cset *ChangeSet
 	vals Values
-
-	exit chan bool
 
 	idx      int
 	watchers map[int]*watcher
@@ -57,7 +55,6 @@ func newPlatform(opts ...Option) Config {
 	}
 
 	go p.run()
-
 	return p
 }
 

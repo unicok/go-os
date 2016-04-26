@@ -13,8 +13,8 @@ import (
 )
 
 type platform struct {
-	opts Options
 	exit chan bool
+	opts Options
 
 	reg proto2.RegistryClient
 
@@ -49,6 +49,7 @@ func newPlatform(opts ...Option) Discovery {
 	}
 
 	p := &platform{
+		exit:       make(chan bool),
 		opts:       opt,
 		heartbeats: make(map[string]*proto.Heartbeat),
 		cache:      make(map[string][]*registry.Service),

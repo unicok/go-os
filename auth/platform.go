@@ -13,13 +13,12 @@ import (
 )
 
 type platform struct {
+	exit chan bool
 	opts Options
 	c    oauth2.Oauth2Client
 
 	sync.Mutex
 	t *Token
-
-	exit chan bool
 }
 
 type tokenKey struct{}

@@ -58,6 +58,7 @@ func newPlatform(opts ...selector.Option) Router {
 	}
 
 	p := &platform{
+		exit:   make(chan bool),
 		opts:   options,
 		client: c,
 		server: s,
@@ -67,7 +68,6 @@ func newPlatform(opts ...selector.Option) Router {
 	}
 
 	go p.run()
-
 	return p
 }
 

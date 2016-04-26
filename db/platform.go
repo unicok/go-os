@@ -11,8 +11,7 @@ import (
 
 type platform struct {
 	opts Options
-
-	c db.DBClient
+	c    db.DBClient
 }
 
 func newPlatform(opts ...Option) DB {

@@ -10,11 +10,11 @@ import (
 )
 
 type platform struct {
+	exit chan bool
 	opts Options
 
 	sync.Mutex
-	buf  chan string
-	exit chan bool
+	buf chan string
 }
 
 type counter struct {
@@ -52,12 +52,12 @@ func newPlatform(opts ...Option) Metrics {
 	}
 
 	p := &platform{
+		exit: make(chan bool),
 		opts: options,
 		buf:  make(chan string, 1000),
 	}
 
 	go p.run()
-
 	return p
 }
 

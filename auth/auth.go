@@ -14,6 +14,7 @@ import (
 // The client does not actually handle authentication itself.
 // This could be an oauth2 provider, openid, basic auth, etc.
 type Auth interface {
+	Close() error
 	// Determine if a request with context is authorised
 	// Should extract token from the context, check with
 	// the authorizer and return an err if not authed.
@@ -34,8 +35,6 @@ type Auth interface {
 	FromHeader(map[string]string) (*Token, bool)
 	// Adds token to headers
 	NewHeader(map[string]string, *Token) map[string]string
-	// Render auth unusable
-	Close() error
 	// Name
 	String() string
 }
