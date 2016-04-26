@@ -79,6 +79,10 @@ func recordToProto(r Record) *db.Record {
 	}
 }
 
+func (p *platform) Close() error {
+	return nil
+}
+
 func (p *platform) Init(opts ...Option) error {
 	// No reinits
 	return nil
@@ -166,12 +170,4 @@ func (p *platform) Search(md Metadata, limit, offset int64) ([]Record, error) {
 
 func (p *platform) String() string {
 	return "platform"
-}
-
-func (p *platform) Start() error {
-	return nil
-}
-
-func (p *platform) Stop() error {
-	return nil
 }

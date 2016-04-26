@@ -18,10 +18,8 @@ const (
 type Discovery interface {
 	// implements the registry interface
 	registry.Registry
-	// starts the watcher, caching and heartbeating
-	Start() error
-	// stops the watcher, caching and hearbeating
-	Stop() error
+	// Render discovery unusable
+	Close() error
 }
 
 type Options struct {

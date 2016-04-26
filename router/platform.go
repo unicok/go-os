@@ -17,6 +17,7 @@ import (
 )
 
 type platform struct {
+	exit chan bool
 	opts selector.Options
 
 	client client.Client
@@ -29,10 +30,7 @@ type platform struct {
 	// stats cache client calls service:[]stats
 
 	sync.RWMutex
-	running bool
-	exit    chan bool
-	stats   map[string]*stats
-
+	stats map[string]*stats
 	cache map[string]*cache
 }
 
@@ -59,7 +57,7 @@ func newPlatform(opts ...selector.Option) Router {
 		s = server.DefaultServer
 	}
 
-	return &platform{
+	p := &platform{
 		opts:   options,
 		client: c,
 		server: s,
@@ -67,6 +65,10 @@ func newPlatform(opts ...selector.Option) Router {
 		stats:  make(map[string]*stats),
 		r:      proto.NewRouterClient("go.micro.srv.router", c),
 	}
+
+	go p.run()
+
+	return p
 }
 
 func (p *platform) newStats(s *registry.Service, node *registry.Node) {
@@ -297,6 +299,16 @@ func (p *platform) run() {
 	}
 }
 
+func (p *platform) Close() error {
+	select {
+	case <-p.exit:
+		return nil
+	default:
+		close(p.exit)
+	}
+	return nil
+}
+
 func (p *platform) Init(opts ...selector.Option) error {
 	var options selector.Options
 	for _, o := range opts {
@@ -376,38 +388,6 @@ func (p *platform) Reset(service string) {
 			stat.Reset()
 		}
 	}
-}
-
-func (p *platform) Close() error {
-	return p.Stop()
-}
-
-func (p *platform) Start() error {
-	p.Lock()
-	defer p.Unlock()
-
-	if p.running {
-		return nil
-	}
-
-	p.running = true
-	p.exit = make(chan bool)
-	go p.run()
-	return nil
-}
-
-func (p *platform) Stop() error {
-	p.Lock()
-	defer p.Unlock()
-
-	if !p.running {
-		return nil
-	}
-
-	close(p.exit)
-	p.exit = nil
-	p.running = false
-	return nil
 }
 
 func (p *platform) String() string {

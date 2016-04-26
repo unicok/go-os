@@ -72,10 +72,7 @@ func main() {
 		config.WithSource(file.NewSource(config.SourceName(configFile))),
 	)
 
-	fmt.Println("Starting config runner")
-
-	// Start the config runner which polls config
-	config.Start()
+	defer config.Close()
 
 	// lets read the value while editing it a number of times
 	for i := 0; i < 10; i++ {
@@ -92,7 +89,4 @@ func main() {
 	watch(config, "foo")
 
 	fmt.Println("Stopping config runner")
-
-	// Stop the runner. The cache is still populated
-	config.Stop()
 }

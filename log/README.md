@@ -11,16 +11,10 @@ logs messages with metadata with the ability to send to multiple outputs.
 // A structure log interface which can
 // output to multiple backends.
 type Log interface {
+	Close() error
 	Init(opts ...Option) error
 	Options() Options
-	// the logging interface
 	Logger
-	// We could be flushing logs on an interval basis
-	// Or sending specific stats to the log service
-	// Or receive events about changing log config
-	Start() error
-	Stop() error
-	// Name
 	String() string
 }
 

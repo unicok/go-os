@@ -30,7 +30,7 @@ func main() {
 
 	// Start the key value gossiping
 	keyval := kv.NewKV()
-	keyval.Start()
+	defer keyval.Close()
 
 	// Start server since we have to be
 	// part of the hash ring for now

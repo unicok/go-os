@@ -79,6 +79,10 @@ func (p *platform) log(l Level, f Fields, m string) error {
 	return gerr
 }
 
+func (p *platform) Close() error {
+	return nil
+}
+
 func (p *platform) Init(opts ...Option) error {
 	for _, o := range opts {
 		o(&p.opts)
@@ -88,14 +92,6 @@ func (p *platform) Init(opts ...Option) error {
 
 func (p *platform) Options() Options {
 	return p.opts
-}
-
-func (p *platform) Start() error {
-	return nil
-}
-
-func (p *platform) Stop() error {
-	return nil
 }
 
 func (p *platform) String() string {

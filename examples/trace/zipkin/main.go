@@ -131,18 +131,13 @@ func main() {
 	t := zipkin.NewTrace(
 		trace.Collectors([]string{"192.168.99.100:9092"}),
 	)
+	defer t.Close()
 
 	client.DefaultClient = client.NewClient(
 		client.Wrap(
 			trace.ClientWrapper(t, nil),
 		),
 	)
-
-	fmt.Println("Starting trace")
-	if err := t.Start(); err != nil {
-		fmt.Println(err)
-		return
-	}
 
 	fmt.Println("\n--- Traced Call example ---\n")
 	for i := 0; i < 10; i++ {
@@ -160,8 +155,4 @@ func main() {
 		pub()
 	*/
 	<-time.After(time.Second * 10)
-
-	if err := t.Stop(); err != nil {
-		fmt.Println(err)
-	}
 }

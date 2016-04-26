@@ -36,10 +36,7 @@ func main() {
 	cmd.Init()
 
 	t := trace.NewTrace()
-
-	if err := t.Start(); err != nil {
-		log.Fatal(err)
-	}
+	defer t.Close()
 
 	srv := &registry.Service{
 		Name: "go.micro.srv.example",
@@ -75,10 +72,6 @@ func main() {
 
 	// Run server
 	if err := server.Run(); err != nil {
-		log.Fatal(err)
-	}
-
-	if err := t.Stop(); err != nil {
 		log.Fatal(err)
 	}
 }

@@ -5,7 +5,6 @@ import (
 	"math/rand"
 	"net"
 	"strconv"
-	"sync"
 	"time"
 
 	"github.com/micro/go-micro/registry"
@@ -23,10 +22,7 @@ type zipkinKey struct{}
 type zipkin struct {
 	opts  trace.Options
 	spans chan *trace.Span
-
-	sync.Mutex
-	running bool
-	exit    chan bool
+	exit  chan bool
 }
 
 var (
@@ -60,10 +56,13 @@ func newZipkin(opts ...trace.Option) trace.Trace {
 		opt.Topic = TraceTopic
 	}
 
-	return &zipkin{
+	z := &zipkin{
 		opts:  opt,
 		spans: make(chan *trace.Span, 100),
 	}
+
+	go z.run()
+	return z
 }
 
 func toInt64(s string) int64 {
@@ -152,9 +151,10 @@ func (z *zipkin) pub(s *zipkincore.Span, pr sarama.SyncProducer) {
 	pr.SendMessage(m)
 }
 
-func (z *zipkin) run(ch chan bool, p sarama.SyncProducer) {
+func (z *zipkin) run() {
 	t := time.NewTicker(z.opts.BatchInterval)
 
+	p, _ := sarama.NewSyncProducer(z.opts.Collectors, sarama.NewConfig())
 	var buf []*trace.Span
 
 	for {
@@ -171,7 +171,7 @@ func (z *zipkin) run(ch chan bool, p sarama.SyncProducer) {
 				go z.send(buf, p)
 				buf = nil
 			}
-		case <-ch:
+		case <-z.exit:
 			// exit
 			t.Stop()
 			p.Close()
@@ -184,6 +184,16 @@ func (z *zipkin) send(b []*trace.Span, p sarama.SyncProducer) {
 	for _, span := range b {
 		z.pub(toThrift(span), p)
 	}
+}
+
+func (z *zipkin) Close() error {
+	select {
+	case <-z.exit:
+		return nil
+	default:
+		close(z.exit)
+	}
+	return nil
 }
 
 func (z *zipkin) Collect(s *trace.Span) error {
@@ -262,40 +272,6 @@ func (z *zipkin) NewHeader(md map[string]string, s *trace.Span) map[string]strin
 	md[ParentHeader] = s.ParentId
 	md[SampleHeader] = sample
 	return md
-}
-
-func (z *zipkin) Start() error {
-	z.Lock()
-	defer z.Unlock()
-
-	if z.running {
-		return nil
-	}
-
-	p, err := sarama.NewSyncProducer(z.opts.Collectors, sarama.NewConfig())
-	if err != nil {
-		return err
-	}
-
-	ch := make(chan bool)
-	go z.run(ch, p)
-	z.exit = ch
-	z.running = true
-	return nil
-}
-
-func (z *zipkin) Stop() error {
-	z.Lock()
-	defer z.Unlock()
-
-	if !z.running {
-		return nil
-	}
-
-	close(z.exit)
-	z.running = false
-	z.exit = nil
-	return nil
 }
 
 func (z *zipkin) String() string {

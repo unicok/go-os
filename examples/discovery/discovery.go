@@ -14,6 +14,8 @@ func main() {
 		discovery.Interval(time.Second),
 	)
 
+	defer d.Close()
+
 	service := &registry.Service{
 		Name:    "go.micro.srv.foo",
 		Version: "latest",
@@ -52,10 +54,6 @@ func main() {
 	if err := d.Register(service); err != nil {
 		fmt.Println(err)
 	}
-
-	fmt.Println("Starting discovery, will sleep for 10 seconds")
-	d.Start()
-
 	// find self
 	rsp, err := d.GetService("go.micro.srv.foo")
 	if err != nil {
@@ -65,9 +63,6 @@ func main() {
 	}
 
 	<-time.After(time.Second * 10)
-
-	fmt.Println("Stopping discovery")
-	d.Stop()
 
 	// deregister
 	if err := d.Deregister(service); err != nil {

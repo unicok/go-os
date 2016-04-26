@@ -19,6 +19,10 @@ type consulSync struct {
 	node *registry.Node
 }
 
+func (c *consulSync) Close() error {
+	return nil
+}
+
 func (c *consulSync) Lock(id string, opts ...sync.LockOption) (sync.Lock, error) {
 	var options sync.LockOptions
 	for _, o := range opts {
@@ -94,14 +98,6 @@ func (c *consulSync) Leader(id string, opts ...sync.LeaderOption) (sync.Leader, 
 
 func (c *consulSync) String() string {
 	return "consul"
-}
-
-func (c *consulSync) Start() error {
-	return nil
-}
-
-func (c *consulSync) Stop() error {
-	return nil
 }
 
 func NewSync(opts ...sync.Option) sync.Sync {

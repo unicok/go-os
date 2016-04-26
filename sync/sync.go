@@ -13,15 +13,11 @@ const (
 type LeaderStatus int32
 
 type Sync interface {
+	Close() error
 	// distributed lock interface
 	Lock(id string, opts ...LockOption) (Lock, error)
 	// leader election interface
 	Leader(id string, opts ...LeaderOption) (Leader, error)
-	// Start/Stop the internal publisher
-	// used to announce this client and
-	// subscribe to announcements.
-	Start() error
-	Stop() error
 	// Name of sync
 	String() string
 }

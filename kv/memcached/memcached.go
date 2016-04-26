@@ -11,6 +11,10 @@ type mkv struct {
 	Client *mc.Client
 }
 
+func (m *mkv) Close() error {
+	return nil
+}
+
 func (m *mkv) Get(key string) (*kv.Item, error) {
 	keyval, err := m.Client.Get(key)
 	if err != nil && err == mc.ErrCacheMiss {
@@ -40,14 +44,6 @@ func (m *mkv) Put(item *kv.Item) error {
 		Value:      item.Value,
 		Expiration: int32(item.Expiration.Seconds()),
 	})
-}
-
-func (m *mkv) Start() error {
-	return nil
-}
-
-func (m *mkv) Stop() error {
-	return nil
 }
 
 func (m *mkv) String() string {

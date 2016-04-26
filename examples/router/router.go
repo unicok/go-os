@@ -78,11 +78,7 @@ func main() {
 	cmd.Init()
 
 	r := router.NewRouter()
-
-	if err := r.Start(); err != nil {
-		fmt.Println(err)
-		return
-	}
+	defer r.Close()
 
 	ch := make(chan map[string]int, routines)
 	stats := make(map[string]int)
@@ -105,11 +101,6 @@ func main() {
 		for k, v := range st {
 			stats[k] += v
 		}
-	}
-
-	if err := r.Stop(); err != nil {
-		fmt.Println(err)
-		return
 	}
 
 	for k, v := range stats {

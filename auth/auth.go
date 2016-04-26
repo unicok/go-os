@@ -34,9 +34,8 @@ type Auth interface {
 	FromHeader(map[string]string) (*Token, bool)
 	// Adds token to headers
 	NewHeader(map[string]string, *Token) map[string]string
-	// We cache policies locally from the auth server
-	Start() error
-	Stop() error
+	// Render auth unusable
+	Close() error
 	// Name
 	String() string
 }

@@ -18,9 +18,8 @@ type Config interface {
 	Values
 	// Config options
 	Options() Options
-	// Start/Stop for internal interval updater, etc.
-	Start() error
-	Stop() error
+	// Render unusable
+	Close() error
 	// String name of config; platform
 	String() string
 }

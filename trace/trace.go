@@ -27,6 +27,7 @@ const (
 type AnnotationType int32
 
 type Trace interface {
+	Close() error
 	// New span with certain fields preset.
 	// Provide parent span if you have it.
 	NewSpan(*Span) *Span
@@ -38,13 +39,8 @@ type Trace interface {
 	NewHeader(map[string]string, *Span) map[string]string
 	// Get span from header
 	FromHeader(map[string]string) (*Span, bool)
-
 	// Collect spans
 	Collect(*Span) error
-	// Start the collector
-	Start() error
-	// Stop the collector
-	Stop() error
 	// Name
 	String() string
 }

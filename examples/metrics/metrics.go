@@ -21,11 +21,7 @@ func main() {
 		}),
 	)
 
-	// Start the collector
-	if err := m.Start(); err != nil {
-		fmt.Println(err)
-		return
-	}
+	defer m.Close()
 
 	c := m.Counter("example.counters.foo")
 	g := m.Gauge("example.gauges.foo")

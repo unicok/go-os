@@ -18,6 +18,7 @@ Event sourcing can be tackled in a separate package.
 
 ```go
 type DB interface {
+	Close() error
         Init(...Option) error
         Options() Options
         Read(id string) (Record, error)
@@ -26,11 +27,6 @@ type DB interface {
         Delete(id string) error
         Search(md Metadata, limit, offset int64) ([]Record, error)
         String() string
-        // Potential expiremental in memory DB
-        // needs to be started/stopped to be part of a ring
-        // Also publishing to notify this is querying dbs
-        Start() error
-        Stop() error
 }
 
 type Option func(*Options)

@@ -20,14 +20,11 @@ import (
 // Can optionally be namespaced using that provided
 type platform struct {
 	opts Options
-
+	exit chan bool
 	hash *consistent.Consistent
 
 	sync.RWMutex
 	nodes map[string]int64
-
-	running bool
-	exit    chan bool
 }
 
 type Announcement struct {
@@ -65,6 +62,7 @@ func newPlatform(opts ...Option) KV {
 	}
 
 	p := &platform{
+		exit:  make(chan bool),
 		opts:  options,
 		hash:  consistent.New(),
 		nodes: make(map[string]int64),
@@ -81,6 +79,8 @@ func newPlatform(opts ...Option) KV {
 			&proto.KV{new(kv)}, server.InternalHandler(true),
 		),
 	)
+
+	go p.run()
 
 	return p
 }
@@ -158,7 +158,7 @@ func (p *platform) reap() {
 	mtx.Unlock()
 }
 
-func (p *platform) run(exit chan bool) {
+func (p *platform) run() {
 	// immediately add self to ring
 	for i := 0; i < 10; i++ {
 		// wait till there's a valid address from the server
@@ -186,7 +186,7 @@ func (p *platform) run(exit chan bool) {
 			p.publish()
 		case <-r.C:
 			p.reap()
-		case <-exit:
+		case <-p.exit:
 			t.Stop()
 			r.Stop()
 			return
@@ -218,6 +218,18 @@ func (p *platform) subscriber(ctx context.Context, a *Announcement) error {
 
 	p.nodes[a.Address] = a.Timestamp
 	return nil
+}
+
+func (p *platform) Close() error {
+	select {
+	case <-p.exit:
+		return nil
+	default:
+		close(p.exit)
+
+	}
+	return nil
+
 }
 
 func (p *platform) Get(key string) (*Item, error) {
@@ -295,36 +307,6 @@ func (p *platform) Put(item *Item) error {
 	}
 
 	return gerr
-}
-
-func (p *platform) Start() error {
-	p.Lock()
-	defer p.Unlock()
-
-	if p.running {
-		return nil
-	}
-
-	exit := make(chan bool)
-	go p.run(exit)
-
-	p.exit = exit
-	p.running = true
-	return nil
-}
-
-func (p *platform) Stop() error {
-	p.Lock()
-	defer p.Unlock()
-
-	if !p.running {
-		return nil
-	}
-
-	close(p.exit)
-	p.exit = nil
-
-	return nil
 }
 
 func (p *platform) String() string {

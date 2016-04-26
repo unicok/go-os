@@ -14,10 +14,9 @@ collates stats about the service and periodically publishes.
 // This includes status; started/running/stopped,
 // stats; cpu, memory, runtime and healthchecks.
 type Monitor interface {
+	Close() error
 	Checker
 	Stats
-	Start() error
-	Stop() error
 	String() string
 }
 

@@ -9,15 +9,11 @@ behaviour and AP for eventually consistent semantics.
 
 ```go
 type Sync interface {
+	Close() error
         // distributed lock interface
         Lock(...LockOption) (Lock, error)
         // leader election interface
         Leader(...LeaderOption) (Leader, error)
-        // Start/Stop the internal publisher
-        // used to announce this client and
-        // subscribe to announcements.
-        Start() error
-        Stop() error
 }
 
 type Lock interface {
