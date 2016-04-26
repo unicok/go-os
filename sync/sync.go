@@ -13,7 +13,6 @@ const (
 type LeaderStatus int32
 
 type Sync interface {
-	Close() error
 	// distributed lock interface
 	Lock(id string, opts ...LockOption) (Lock, error)
 	// leader election interface

@@ -79,10 +79,6 @@ func (p *platform) log(l Level, f Fields, m string) error {
 	return gerr
 }
 
-func (p *platform) Close() error {
-	return nil
-}
-
 func (p *platform) Init(opts ...Option) error {
 	for _, o := range opts {
 		o(&p.opts)

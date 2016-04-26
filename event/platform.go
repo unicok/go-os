@@ -56,10 +56,6 @@ func toProto(r *Record) *event.Record {
 	}
 }
 
-func (p *platform) Close() error {
-	return nil
-}
-
 func (p *platform) Publish(ctx context.Context, r *Record) error {
 	if len(r.Type) == 0 {
 		r.Type = DefaultEventType

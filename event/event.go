@@ -5,7 +5,6 @@ import (
 )
 
 type Event interface {
-	Close() error
 	// publish an event record
 	Publish(context.Context, *Record) error
 	// subscribe to an event types

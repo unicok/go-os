@@ -11,7 +11,6 @@ logs messages with metadata with the ability to send to multiple outputs.
 // A structure log interface which can
 // output to multiple backends.
 type Log interface {
-	Close() error
 	Init(opts ...Option) error
 	Options() Options
 	Logger

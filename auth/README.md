@@ -42,8 +42,6 @@ type Auth interface {
 	FromHeader(map[string]string) (*Token, bool)
 	// Adds token to headers
 	NewHeader(map[string]string, *Token) map[string]string
-	// Render auth unusable
-	Close() error
 	// Name
 	String() string
 }

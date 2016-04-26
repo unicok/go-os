@@ -8,7 +8,6 @@ By tracking platform events we can essentially build a platform event correlatio
 
 ```go
 type Event interface {
-	Close() error
 	// publish an event record
 	Publish(context.Context, *Record) error
 	// subscribe to an event types

@@ -38,23 +38,7 @@ func newPlatform(opts ...Option) Auth {
 		c:    oauth2.NewOauth2Client("go.micro.srv.auth", options.Client),
 	}
 
-	go p.run()
 	return p
-}
-
-func (p *platform) run() {
-	// TODO: implement policy caching... hell implement policies
-	return
-}
-
-func (p *platform) Close() error {
-	select {
-	case <-p.exit:
-		return nil
-	default:
-		close(p.exit)
-	}
-	return nil
 }
 
 func (p *platform) Authorized(ctx context.Context, req Request) (*Token, error) {
