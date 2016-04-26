@@ -9,7 +9,6 @@ behaviour and AP for eventually consistent semantics.
 
 ```go
 type Sync interface {
-	Close() error
         // distributed lock interface
         Lock(...LockOption) (Lock, error)
         // leader election interface
