@@ -13,9 +13,8 @@ import (
 )
 
 type platform struct {
-	opts    Options
-	exit    chan bool
-	watcher registry.Watcher
+	exit chan bool
+	opts Options
 
 	reg proto2.RegistryClient
 
@@ -49,12 +48,16 @@ func newPlatform(opts ...Option) Discovery {
 		opt.Interval = time.Second * 30
 	}
 
-	return &platform{
+	p := &platform{
+		exit:       make(chan bool),
 		opts:       opt,
 		heartbeats: make(map[string]*proto.Heartbeat),
 		cache:      make(map[string][]*registry.Service),
 		reg:        proto2.NewRegistryClient("go.micro.srv.discovery", opt.Client),
 	}
+
+	go p.run()
+	return p
 }
 
 func values(v []*registry.Value) []*proto.Value {
@@ -215,21 +218,20 @@ func (p *platform) heartbeat(t *time.Ticker) {
 }
 
 func (p *platform) watch(ch chan *registry.Result) {
-	p.RLock()
-	watch := p.watcher
-	p.RUnlock()
+	watch, _ := p.Watch()
+	defer watch.Stop()
 
 	for {
 		next, err := watch.Next()
 		if err != nil {
 			w, err := p.Watch()
 			if err != nil {
-				return
+				time.Sleep(time.Second)
+				continue
 			}
-			p.Lock()
-			p.watcher = w
-			p.Unlock()
+			watch.Stop()
 			watch = w
+			time.Sleep(time.Second)
 			continue
 		}
 		ch <- next
@@ -356,6 +358,16 @@ func (p *platform) update(res *registry.Result) {
 	}
 }
 
+func (p *platform) Close() error {
+	select {
+	case <-p.exit:
+		return nil
+	default:
+		close(p.exit)
+	}
+	return nil
+}
+
 // TODO: publish event
 func (p *platform) Register(s *registry.Service, opts ...registry.RegisterOption) error {
 	p.Lock()
@@ -474,32 +486,4 @@ func (p *platform) Watch() (registry.Watcher, error) {
 
 func (p *platform) String() string {
 	return "platform"
-}
-
-func (p *platform) Start() error {
-	p.Lock()
-	defer p.Unlock()
-
-	if p.watcher == nil {
-		w, err := p.Watch()
-		if err != nil {
-			return err
-		}
-		p.watcher = w
-		p.exit = make(chan bool)
-		go p.run()
-	}
-
-	return nil
-}
-
-func (p *platform) Stop() error {
-	p.Lock()
-	defer p.Unlock()
-	if p.watcher != nil {
-		p.watcher.Stop()
-		p.watcher = nil
-		close(p.exit)
-	}
-	return nil
 }

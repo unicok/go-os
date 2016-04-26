@@ -32,6 +32,7 @@ func main() {
 	cmd.Init()
 
 	t := trace.NewTrace()
+	defer t.Close()
 
 	srv := &registry.Service{
 		Name: "go.micro.client.example",
@@ -43,21 +44,11 @@ func main() {
 		),
 	)
 
-	fmt.Println("Starting trace")
-	if err := t.Start(); err != nil {
-		fmt.Println(err)
-		return
-	}
-
 	fmt.Println("\n--- Traced Call example ---\n")
 	i := 0
 	for {
 		call(i)
 		i++
 		<-time.After(time.Second * 5)
-	}
-
-	if err := t.Stop(); err != nil {
-		fmt.Println(err)
 	}
 }

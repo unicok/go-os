@@ -11,15 +11,12 @@ import (
 )
 
 type platform struct {
+	exit chan bool
 	opts Options
 
 	sync.RWMutex
-
 	cset *ChangeSet
 	vals Values
-
-	running bool
-	exit    chan bool
 
 	idx      int
 	watchers map[int]*watcher
@@ -51,20 +48,24 @@ func newPlatform(opts ...Option) Config {
 		options.Sources = append(options.Sources, NewSource(SourceClient(options.Client)))
 	}
 
-	return &platform{
+	p := &platform{
+		exit:     make(chan bool),
 		opts:     options,
 		watchers: make(map[int]*watcher),
 	}
+
+	go p.run()
+	return p
 }
 
-func (p *platform) run(ch chan bool) {
+func (p *platform) run() {
 	t := time.NewTicker(p.opts.PollInterval)
 
 	for {
 		select {
 		case <-t.C:
 			p.sync()
-		case <-ch:
+		case <-p.exit:
 			t.Stop()
 			return
 		}
@@ -142,6 +143,16 @@ func (p *platform) sync() {
 	p.Unlock()
 
 	p.update()
+}
+
+func (p *platform) Close() error {
+	select {
+	case <-p.exit:
+		return nil
+	default:
+		close(p.exit)
+	}
+	return nil
 }
 
 func (p *platform) Get(path ...string) Value {
@@ -230,32 +241,6 @@ func (p *platform) Bytes() []byte {
 
 func (p *platform) Options() Options {
 	return p.opts
-}
-
-func (p *platform) Start() error {
-	p.Lock()
-	defer p.Unlock()
-	if p.running {
-		return nil
-	}
-
-	p.running = true
-	p.exit = make(chan bool)
-	go p.run(p.exit)
-	return nil
-}
-
-func (p *platform) Stop() error {
-	p.Lock()
-	defer p.Unlock()
-	if !p.running {
-		return nil
-	}
-
-	p.running = false
-	close(p.exit)
-	p.exit = nil
-	return nil
 }
 
 func (p *platform) String() string {

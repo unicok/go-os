@@ -16,12 +16,8 @@ const (
 // for finding services. It includes heartbeating
 // to notify of liveness and caching of the registry.
 type Discovery interface {
-	// implements the registry interface
+	Close() error
 	registry.Registry
-	// starts the watcher, caching and heartbeating
-	Start() error
-	// stops the watcher, caching and hearbeating
-	Stop() error
 }
 
 type Options struct {

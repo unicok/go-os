@@ -6,16 +6,10 @@ Provides a high level abstraction for key-value stores.
 
 ```go
 type KV interface {
+	Close() error
 	Get(key string) (*Item, error)
 	Del(key string) error
 	Put(item *Item) error
-
-	// Runtime. Could be used for internal reaping
-	// of expired keys or publishing info, gossip,
-	// etc
-	Start() error
-	Stop() error
-	// Name
 	String() string
 }
 

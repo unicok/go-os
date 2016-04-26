@@ -14,9 +14,8 @@ type Config interface {
 	Options() Options
 	// Watch for changes
 	Watch(path ...string) (Watcher, error)
-	// Start/Stop for internal interval updater, etc.
-	Start() error
-	Stop() error
+	// Render config unusable
+	Close() error
 	// String name of config; platform
 	String() string
 }

@@ -13,8 +13,7 @@ import (
 
 type platform struct {
 	opts Options
-
-	cl ev.EventClient
+	cl   ev.EventClient
 }
 
 func newPlatform(opts ...Option) Event {
@@ -57,6 +56,10 @@ func toProto(r *Record) *event.Record {
 	}
 }
 
+func (p *platform) Close() error {
+	return nil
+}
+
 func (p *platform) Publish(ctx context.Context, r *Record) error {
 	if len(r.Type) == 0 {
 		r.Type = DefaultEventType
@@ -94,14 +97,6 @@ func (p *platform) Subscribe(ctx context.Context, h Handler, types ...string) er
 		h(toRecord(rsp.Record))
 	}
 
-	return nil
-}
-
-func (p *platform) Start() error {
-	return nil
-}
-
-func (p *platform) Stop() error {
 	return nil
 }
 

@@ -2,7 +2,6 @@ package trace
 
 import (
 	"errors"
-	"sync"
 	"time"
 
 	"github.com/micro/go-micro/client"
@@ -16,13 +15,9 @@ import (
 type spanKey struct{}
 
 type platform struct {
-	opts Options
-
+	opts  Options
 	spans chan *Span
-
-	sync.Mutex
-	running bool
-	exit    chan bool
+	exit  chan bool
 }
 
 func newPlatform(opts ...Option) Trace {
@@ -47,10 +42,15 @@ func newPlatform(opts ...Option) Trace {
 		opt.Client = client.DefaultClient
 	}
 
-	return &platform{
+	p := &platform{
+		exit:  make(chan bool),
 		opts:  opt,
 		spans: make(chan *Span, 100),
 	}
+
+	go p.run()
+
+	return p
 }
 
 func serviceToProto(s *registry.Service) *proto.Service {
@@ -122,7 +122,7 @@ func (p *platform) send(buf []*Span) {
 	}
 }
 
-func (p *platform) run(exit chan bool) {
+func (p *platform) run() {
 	t := time.NewTicker(p.opts.BatchInterval)
 
 	var buf []*Span
@@ -141,11 +141,21 @@ func (p *platform) run(exit chan bool) {
 				go p.send(buf)
 				buf = nil
 			}
-		case <-exit:
+		case <-p.exit:
 			t.Stop()
 			return
 		}
 	}
+}
+
+func (p *platform) Close() error {
+	select {
+	case <-p.exit:
+		return nil
+	default:
+		close(p.exit)
+	}
+	return nil
 }
 
 func (p *platform) Collect(s *Span) error {
@@ -231,35 +241,6 @@ func (p *platform) NewHeader(md map[string]string, s *Span) map[string]string {
 	md[ParentHeader] = s.ParentId
 	md[DebugHeader] = debug
 	return md
-}
-
-func (p *platform) Start() error {
-	p.Lock()
-	defer p.Unlock()
-
-	if p.running {
-		return nil
-	}
-
-	ch := make(chan bool)
-	go p.run(ch)
-	p.exit = ch
-	p.running = true
-	return nil
-}
-
-func (p *platform) Stop() error {
-	p.Lock()
-	defer p.Unlock()
-
-	if !p.running {
-		return nil
-	}
-
-	close(p.exit)
-	p.running = false
-	p.exit = nil
-	return nil
 }
 
 func (p *platform) String() string {

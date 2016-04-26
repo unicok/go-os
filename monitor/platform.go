@@ -19,14 +19,13 @@ var (
 )
 
 type platform struct {
+	exit              chan bool
 	opts              Options
 	name, version, id string
 
 	sync.Mutex
-	running bool
-	exit    chan bool
-	hc      map[string]HealthChecker
-	stat    *stats
+	hc   map[string]HealthChecker
+	stat *stats
 }
 
 func newPlatform(opts ...Option) Monitor {
@@ -49,14 +48,17 @@ func newPlatform(opts ...Option) Monitor {
 
 	c := opt.Server.Options()
 
-	return &platform{
+	p := &platform{
 		name:    c.Name,
 		version: c.Version,
 		id:      c.Id,
 		opts:    opt,
-		exit:    make(chan bool, 1),
+		exit:    make(chan bool),
 		hc:      make(map[string]HealthChecker),
 	}
+
+	go p.run()
+	return p
 }
 
 func (p *platform) stats() {
@@ -203,6 +205,16 @@ func (p *platform) run() {
 	}
 }
 
+func (p *platform) Close() error {
+	select {
+	case <-p.exit:
+		return nil
+	default:
+		close(p.exit)
+	}
+	return nil
+}
+
 func (p *platform) NewHealthChecker(id, desc string, hc HealthCheck) HealthChecker {
 	return newHealthChecker(id, desc, hc)
 }
@@ -237,27 +249,6 @@ func (p *platform) HealthChecks() ([]HealthChecker, error) {
 func (p *platform) RecordStat(r Request, d time.Duration, err error) {
 	// TODO: implement recording
 	return
-}
-
-func (p *platform) Start() error {
-	p.Lock()
-	defer p.Unlock()
-	if p.running {
-		return nil
-	}
-	go p.run()
-	p.running = true
-	return nil
-}
-
-func (p *platform) Stop() error {
-	p.Lock()
-	defer p.Unlock()
-	if p.running {
-		p.exit <- true
-		p.running = false
-	}
-	return nil
 }
 
 func (p *platform) String() string {

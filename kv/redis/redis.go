@@ -9,6 +9,10 @@ type rkv struct {
 	Client *redis.Client
 }
 
+func (r *rkv) Close() error {
+	return nil
+}
+
 func (r *rkv) Get(key string) (*kv.Item, error) {
 	val, err := r.Client.Get(key).Bytes()
 
@@ -40,14 +44,6 @@ func (r *rkv) Del(key string) error {
 
 func (r *rkv) Put(item *kv.Item) error {
 	return r.Client.Set(item.Key, item.Value, item.Expiration).Err()
-}
-
-func (r *rkv) Start() error {
-	return nil
-}
-
-func (r *rkv) Stop() error {
-	return nil
 }
 
 func (r *rkv) String() string {

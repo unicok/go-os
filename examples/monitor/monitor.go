@@ -36,15 +36,14 @@ func main() {
 		monitor.Interval(time.Second),
 	)
 
+	defer m.Close()
+
 	hc1 := m.NewHealthChecker("go.micro.healthcheck.ping", "This is a ping healthcheck that succeeds", success)
 	hc2 := m.NewHealthChecker("go.micro.healthcheck.pong", "This is a pong healthcheck that fails", failure)
 
 	m.Register(hc1)
 	m.Register(hc2)
 
-	fmt.Println("Starting monitor, will sleep for 10 seconds")
-	m.Start()
 	<-time.After(time.Second * 10)
 	fmt.Println("Stopping monitor")
-	m.Stop()
 }

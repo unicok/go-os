@@ -13,14 +13,12 @@ import (
 )
 
 type platform struct {
+	exit chan bool
 	opts Options
 	c    oauth2.Oauth2Client
 
 	sync.Mutex
 	t *Token
-
-	running bool
-	exit    chan bool
 }
 
 type tokenKey struct{}
@@ -34,15 +32,29 @@ func newPlatform(opts ...Option) Auth {
 		options.Client = client.DefaultClient
 	}
 
-	return &platform{
+	p := &platform{
+		exit: make(chan bool),
 		opts: options,
 		c:    oauth2.NewOauth2Client("go.micro.srv.auth", options.Client),
 	}
+
+	go p.run()
+	return p
 }
 
-func (p *platform) run(ch <-chan bool) {
+func (p *platform) run() {
 	// TODO: implement policy caching... hell implement policies
 	return
+}
+
+func (p *platform) Close() error {
+	select {
+	case <-p.exit:
+		return nil
+	default:
+		close(p.exit)
+	}
+	return nil
 }
 
 func (p *platform) Authorized(ctx context.Context, req Request) (*Token, error) {
@@ -174,33 +186,6 @@ func (p *platform) NewHeader(hd map[string]string, t *Token) map[string]string {
 	// we basically only store access token
 	hd["authorization"] = t.TokenType + " " + t.AccessToken
 	return hd
-}
-
-func (p *platform) Start() error {
-	p.Lock()
-	defer p.Unlock()
-
-	if p.running {
-		return nil
-	}
-
-	p.exit = make(chan bool)
-	p.running = true
-	go p.run(p.exit)
-	return nil
-}
-
-func (p *platform) Stop() error {
-	p.Lock()
-	defer p.Unlock()
-	if !p.running {
-		return nil
-	}
-
-	close(p.exit)
-	p.exit = nil
-	p.running = false
-	return nil
 }
 
 func (p *platform) String() string {

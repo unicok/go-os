@@ -11,8 +11,7 @@ import (
 
 type platform struct {
 	opts Options
-
-	c db.DBClient
+	c    db.DBClient
 }
 
 func newPlatform(opts ...Option) DB {
@@ -77,6 +76,10 @@ func recordToProto(r Record) *db.Record {
 		Metadata: md,
 		Bytes:    string(r.Bytes()),
 	}
+}
+
+func (p *platform) Close() error {
+	return nil
 }
 
 func (p *platform) Init(opts ...Option) error {
@@ -166,12 +169,4 @@ func (p *platform) Search(md Metadata, limit, offset int64) ([]Record, error) {
 
 func (p *platform) String() string {
 	return "platform"
-}
-
-func (p *platform) Start() error {
-	return nil
-}
-
-func (p *platform) Stop() error {
-	return nil
 }

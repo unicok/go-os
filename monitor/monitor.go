@@ -14,8 +14,7 @@ import (
 type Monitor interface {
 	Checker
 	Stats
-	Start() error
-	Stop() error
+	Close() error
 	String() string
 }
 

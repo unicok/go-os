@@ -10,13 +10,11 @@ import (
 )
 
 type platform struct {
+	exit chan bool
 	opts Options
 
 	sync.Mutex
-	running bool
-	buf     chan string
-	exit    chan bool
-	conn    net.Conn
+	buf chan string
 }
 
 type counter struct {
@@ -53,10 +51,14 @@ func newPlatform(opts ...Option) Metrics {
 		o(&options)
 	}
 
-	return &platform{
+	p := &platform{
+		exit: make(chan bool),
 		opts: options,
 		buf:  make(chan string, 1000),
 	}
+
+	go p.run()
+	return p
 }
 
 func (c *counter) format(v uint64) string {
@@ -175,6 +177,9 @@ func (p *platform) run() {
 	t := time.NewTicker(p.opts.BatchInterval)
 	buf := bytes.NewBuffer(nil)
 
+	conn, _ := net.DialTimeout("udp", p.opts.Collectors[0], time.Second)
+	defer conn.Close()
+
 	for {
 		select {
 		case <-p.exit:
@@ -187,13 +192,23 @@ func (p *platform) run() {
 			if buf.Len() < maxBufferSize {
 				continue
 			}
-			p.conn.Write(buf.Bytes())
+			conn.Write(buf.Bytes())
 			buf.Reset()
 		case <-t.C:
-			p.conn.Write(buf.Bytes())
+			conn.Write(buf.Bytes())
 			buf.Reset()
 		}
 	}
+}
+
+func (p *platform) Close() error {
+	select {
+	case <-p.exit:
+		return nil
+	default:
+		close(p.exit)
+	}
+	return nil
 }
 
 func (p *platform) Init(opts ...Option) error {
@@ -225,39 +240,6 @@ func (p *platform) Histogram(id string) Histogram {
 		buf: p.buf,
 		f:   p.opts.Fields,
 	}
-}
-
-func (p *platform) Start() error {
-	p.Lock()
-	defer p.Unlock()
-
-	if p.running {
-		return nil
-	}
-
-	conn, err := net.DialTimeout("udp", p.opts.Collectors[0], time.Second)
-	if err != nil {
-		return err
-	}
-	p.conn = conn
-	p.exit = make(chan bool)
-	p.running = true
-	go p.run()
-	return nil
-}
-
-func (p *platform) Stop() error {
-	p.Lock()
-	defer p.Unlock()
-
-	if !p.running {
-		return nil
-	}
-
-	close(p.exit)
-	p.exit = nil
-	p.running = false
-	return p.conn.Close()
 }
 
 func (p *platform) String() string {

@@ -19,9 +19,6 @@ type Router interface {
 	Stats() ([]*Stats, error)
 	// Record stats for a request - too many args ugh
 	Record(r Request, node *registry.Node, d time.Duration, err error)
-	// Start/Stop internal publishing, caching, etc
-	Start() error
-	Stop() error
 }
 
 type Stats struct {
