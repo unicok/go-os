@@ -56,3 +56,46 @@ func NewMonitor(opts ...Option) Monitor {
 ## Supported Backends
 
 - Monitor service
+
+## Usage
+
+```go
+
+import (
+	"errors"
+	"time"
+
+	"github.com/micro/go-platform/monitor"
+)
+
+...
+
+m := monitor.NewMonitor(
+	// publish intervale
+	monitor.Interval(time.Second * 10),
+)
+defer m.Close()
+
+hc := m.NewHealthChecker(
+	// check id
+	"go.micro.healthcheck.ping",
+	// description
+	"This is a ping healthcheck that succeeds",
+	// healthcheck function
+	func() (map[string]string, error) {
+		// check some business log
+		stats := ProductMetrics()
+
+		if stats.Errors > 10 {
+			return nil, errors.New("Product is failing")
+		}
+
+		return map[string]string{
+			"stats": stats.Metrics(),
+			"info":  stats.Info(),
+		}, nil
+	},
+)
+
+m.Register(hc)
+```
