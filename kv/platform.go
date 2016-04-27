@@ -15,9 +15,11 @@ import (
 	"stathat.com/c/consistent"
 )
 
-// Consistently hashed in memory key-value store utilising
-// all the services in the network. Aww yea.
-// Can optionally be namespaced using that provided
+/*
+	Platform KV is a consistently hashed in memory key-value store utilising
+	all the services in the network. Aww yea. Can optionally be namespaced using that provided
+*/
+
 type platform struct {
 	opts Options
 	exit chan bool
