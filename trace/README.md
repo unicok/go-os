@@ -64,7 +64,7 @@ for an example - or use the client and server wrappers which will be called on e
 
 Also check out [go-platform/examples/trace](https://github.com/micro/go-platform/tree/master/examples/trace).
 
-```
+```go
 import (
 	"github.com/micro/go-micro"
 	"github.com/micro/go-micro/registry"

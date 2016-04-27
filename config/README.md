@@ -1,4 +1,4 @@
-# Config - Dynamic config interface
+# Config - Dynamic configuration
 
 Provides a high level pluggable abstraction for dynamic configuration.
 
@@ -61,3 +61,50 @@ func NewConfig(opts ...Option) Config {
 - Config service
 - Consul
 - File
+
+## Usage
+
+Config provides a way to use configuration that's dynamically loaded from a variety of backends and subscribe to changes. 
+It also allows the ability to set default values where config might be missing.
+
+```go
+	// Create a config instance
+	config := config.NewConfig(
+		// Poll every minute for changes
+		config.PollInterval(time.Minute),
+		// Use file as a config source
+		config.WithSource(file.NewSource(config.SourceName(configFile))),
+	)
+
+	defer config.Close()
+
+	// Get config at path as string
+	// Sets value 'default' if it does not exist
+	val := config.Get("path", "to", "key").String("default")
+
+
+	// Scan into some type
+	var ival map[string]interface{}
+	if err := config.Get("path", "to", "key").Scan(&ival); err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	// Watch for changes. Optionally specify path to watch.
+	w, err := c.Watch("path", "to", "key")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	for {
+		// Block waiting for changes from watcher.
+		v, err := w.Next()
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		fmt.Println("Received value for key:", v.String("default"))
+	}
+
+```
