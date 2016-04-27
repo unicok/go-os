@@ -73,6 +73,7 @@ It also allows the ability to set default values where config might be missing.
 		// Poll every minute for changes
 		config.PollInterval(time.Minute),
 		// Use file as a config source
+		// Multiple sources can be specified
 		config.WithSource(file.NewSource(config.SourceName(configFile))),
 	)
 
@@ -107,4 +108,19 @@ It also allows the ability to set default values where config might be missing.
 		fmt.Println("Received value for key:", v.String("default"))
 	}
 
+```
+
+## Config Format
+
+The config format expected for backend sources by default is JSON. This is handled by the `Reader` interface. 
+Multiple sources will be read and merged down based on the order they were configured in options. 
+
+```
+{
+	"path": {
+		"to": {
+			"key": ["foo", "bar"]
+		}
+	}
+}
 ```
