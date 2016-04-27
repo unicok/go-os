@@ -78,9 +78,9 @@ defer m.Close()
 
 hc := m.NewHealthChecker(
 	// check id
-	"go.micro.healthcheck.ping",
+	"com.example.check.myproduct",
 	// description
-	"This is a ping healthcheck that succeeds",
+	"Checking product status",
 	// healthcheck function
 	func() (map[string]string, error) {
 		// check some business log
