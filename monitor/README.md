@@ -65,6 +65,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/micro/go-micro"
 	"github.com/micro/go-platform/monitor"
 )
 
@@ -98,4 +99,12 @@ hc := m.NewHealthChecker(
 )
 
 m.Register(hc)
+
+// Additionally use client and handler wrappers to let the monitoring service keep track of endpoint stats.
+
+service := micro.NewService(
+	micro.Name("com.example.srv.service"),
+	micro.WrapClient(monitor.ClientWrapper(m)),
+	micro.WrapHandler(monitor.HandlerWrapper(m)),
+)
 ```

@@ -66,6 +66,18 @@ var (
 	StatsTopic       = "micro.monitor.stats"
 )
 
+func ClientWrapper(m Monitor) client.Wrapper {
+	return func(c client.Client) client.Client {
+		return &clientWrapper{c, m}
+	}
+}
+
+func HandlerWrapper(m Monitor) server.HandlerWrapper {
+	return func(h server.HandlerFunc) server.HandlerFunc {
+		return handlerWrapper(h, m)
+	}
+}
+
 func NewMonitor(opts ...Option) Monitor {
 	return newPlatform(opts...)
 }
