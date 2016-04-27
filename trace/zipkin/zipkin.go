@@ -11,8 +11,8 @@ import (
 	"github.com/micro/go-platform/trace"
 	"github.com/micro/go-platform/trace/zipkin/thrift/gen-go/zipkincore"
 
-	"github.com/Shopify/sarama"
 	"github.com/apache/thrift/lib/go/thrift"
+	sarama "gopkg.in/Shopify/sarama.v1"
 
 	"golang.org/x/net/context"
 )
@@ -57,6 +57,7 @@ func newZipkin(opts ...trace.Option) trace.Trace {
 	}
 
 	z := &zipkin{
+		exit:  make(chan bool),
 		opts:  opt,
 		spans: make(chan *trace.Span, 100),
 	}
@@ -138,23 +139,35 @@ func toThrift(s *trace.Span) *zipkincore.Span {
 }
 
 func (z *zipkin) pub(s *zipkincore.Span, pr sarama.SyncProducer) {
-	t := thrift.NewTMemoryBufferLen(1024)
+	t := thrift.NewTMemoryBuffer()
 	p := thrift.NewTBinaryProtocolTransport(t)
+
 	if err := s.Write(p); err != nil {
 		return
 	}
 
 	m := &sarama.ProducerMessage{
 		Topic: z.opts.Topic,
+		Key:   nil,
 		Value: sarama.ByteEncoder(t.Buffer.Bytes()),
 	}
+
 	pr.SendMessage(m)
 }
 
 func (z *zipkin) run() {
 	t := time.NewTicker(z.opts.BatchInterval)
 
-	p, _ := sarama.NewSyncProducer(z.opts.Collectors, sarama.NewConfig())
+	c, err := sarama.NewClient(z.opts.Collectors, sarama.NewConfig())
+	if err != nil {
+		return
+	}
+
+	p, err := sarama.NewSyncProducerFromClient(c)
+	if err != nil {
+		return
+	}
+
 	var buf []*trace.Span
 
 	for {
