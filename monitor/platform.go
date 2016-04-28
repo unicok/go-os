@@ -49,6 +49,7 @@ func newPlatform(opts ...Option) Monitor {
 	c := opt.Server.Options()
 
 	p := &platform{
+		stat:    newStats(),
 		name:    c.Name,
 		version: c.Version,
 		id:      c.Id,
@@ -62,17 +63,6 @@ func newPlatform(opts ...Option) Monitor {
 }
 
 func (p *platform) stats() {
-	// nothing to diff
-	// defer publishing
-	if p.stat == nil {
-		s := newStats()
-		if s == nil {
-			return
-		}
-		p.stat = s
-		return
-	}
-
 	o := p.stat
 	s := newStats()
 
@@ -119,7 +109,7 @@ func (p *platform) stats() {
 		Memory:    memory,
 		Disk:      disk,
 		Runtime:   rtime,
-		// TODO: add endpoint stats
+		Endpoints: o.endpoints(),
 	}
 
 	req := p.opts.Client.NewPublication(StatsTopic, statsProto)
@@ -185,12 +175,12 @@ func (p *platform) run() {
 	for {
 		select {
 		case <-t.C:
+			p.Lock()
 			// publish stats
 			p.stats()
 			// publish status
 			p.status(proto.Status_RUNNING)
 			// publish healthchecks
-			p.Lock()
 			for _, check := range p.hc {
 				go p.update(check)
 			}
@@ -247,8 +237,9 @@ func (p *platform) HealthChecks() ([]HealthChecker, error) {
 }
 
 func (p *platform) RecordStat(r Request, d time.Duration, err error) {
-	// TODO: implement recording
-	return
+	p.Lock()
+	p.stat.record(r, d, err)
+	p.Unlock()
 }
 
 func (p *platform) String() string {
