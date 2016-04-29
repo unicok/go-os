@@ -27,7 +27,7 @@ type Options struct {
 	Context context.Context
 }
 
-func Servers(s []string) Option {
+func Servers(s ...string) Option {
 	return func(o *Options) {
 		o.Servers = s
 	}

@@ -129,7 +129,7 @@ func main() {
 	cmd.Init()
 
 	t := zipkin.NewTrace(
-		trace.Collectors([]string{"192.168.99.100:9092"}),
+		trace.Collectors("192.168.99.100:9092"),
 	)
 	defer t.Close()
 

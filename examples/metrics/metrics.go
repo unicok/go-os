@@ -15,10 +15,10 @@ func main() {
 			"region":  "eu-west-1",
 			"service": "foo",
 		}),
-		metrics.Collectors([]string{
+		metrics.Collectors(
 			// telegraf/statsd address
 			"127.0.0.1:8125",
-		}),
+		),
 	)
 
 	defer m.Close()

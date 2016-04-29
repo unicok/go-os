@@ -17,7 +17,7 @@ func BatchInterval(b time.Duration) Option {
 	}
 }
 
-func Collectors(c []string) Option {
+func Collectors(c ...string) Option {
 	return func(o *Options) {
 		o.Collectors = c
 	}
