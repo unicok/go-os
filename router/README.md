@@ -1,14 +1,15 @@
 # Router interface
 
-The router is a client interface to a global or federated regional router. 
-A go-micro client uses the registry and then on an individual basis calculates 
-how to route. The router allows decisions to be made across the platform.
+The router is a client library for global service load balancing. Go-micro uses client side load balancing 
+with the `Selector` interface but most implementation only provide a single view point of the environment, 
+from the service itself. The router library talks to a backend service which aggregates metrics from all 
+services and relays back routing information.
 
 ## Interface
 
 ```go
-// The router is the client interface to a
-// global service loadbalancer (GSLB).
+// The router is the client interface for 
+// global service load balancing (GSLB).
 // Metrics are batched and published to
 // a router which has a view of the whole
 // system.
