@@ -2,6 +2,10 @@
 
 Provides a high level pluggable abstraction for monitoring. 
 
+<p align="center">
+  <img src="https://github.com/micro/go-platform/blob/master/doc/monitor.png" />
+</p>
+
 ## Interface
 
 Allows the ability for user defined healthchecks. Exactly what's required for monitoring 
