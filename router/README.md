@@ -5,6 +5,10 @@ with the `Selector` interface but most implementation only provide a single view
 from the service itself. The router library talks to a backend service which aggregates metrics from all 
 services and relays back routing information.
 
+<p align="center">
+  <img src="https://github.com/micro/go-platform/blob/master/doc/router.png" />
+</p>
+
 ## Interface
 
 ```go
