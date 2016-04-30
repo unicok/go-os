@@ -7,6 +7,10 @@ allows RPC based proxying so that we can leverage go-micro and all the plugins. 
 rate limiting, tracing and all the other things to be used. What we lose in database drivers we gain 
 in not having to write CRUD a thousand times over.
 
+<p align="center">
+  <img src="https://github.com/micro/go-platform/blob/master/doc/db.png" />
+</p>
+
 ## Interface
 
 Initial thoughts lie around a CRUD interface. The number of times 
