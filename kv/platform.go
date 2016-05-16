@@ -18,6 +18,8 @@ import (
 /*
 	Platform KV is a consistently hashed in memory key-value store utilising
 	all the services in the network. Aww yea. Can optionally be namespaced using that provided
+
+	Optional the kv-srv can be used rather than having each client participate in the ring.
 */
 
 type platform struct {
@@ -41,12 +43,14 @@ var (
 	serviceName = "go.micro.kv"
 
 	GossipTopic = "go.micro.kv.announce"
-	GossipEvent = time.Second * 5
-	ReaperEvent = time.Second * 30
+	GossipEvent = time.Second * 1
+	ReaperEvent = time.Second * 10
 )
 
 func newPlatform(opts ...Option) KV {
-	var options Options
+	options := Options{
+		Internal: true,
+	}
 	for _, o := range opts {
 		o(&options)
 	}
@@ -72,13 +76,16 @@ func newPlatform(opts ...Option) KV {
 
 	options.Server.Subscribe(
 		options.Server.NewSubscriber(
-			GossipTopic, p.subscriber, server.InternalSubscriber(true),
+			GossipTopic,
+			p.subscriber,
+			server.InternalSubscriber(options.Internal),
 		),
 	)
 
 	options.Server.Handle(
 		options.Server.NewHandler(
-			&proto.KV{new(kv)}, server.InternalHandler(true),
+			&proto.KV{new(kv)},
+			server.InternalHandler(options.Internal),
 		),
 	)
 
@@ -160,20 +167,8 @@ func (p *platform) reap() {
 }
 
 func (p *platform) run() {
-	// immediately add self to ring
-	for i := 0; i < 10; i++ {
-		// wait till there's a valid address from the server
-		if p := strings.Split(p.address(), ":"); len(p) < 2 {
-			time.Sleep(GossipEvent / 100.0)
-			continue
-		}
-		// have a valid address, setup, now
-		p.subscriber(context.Background(), &Announcement{
-			Namespace: p.opts.Namespace,
-			Address:   p.address(),
-			Timestamp: time.Now().Unix(),
-		})
-		break
+	if !p.opts.Service {
+		p.setup()
 	}
 
 	// setup the ticker
@@ -184,7 +179,10 @@ func (p *platform) run() {
 	for {
 		select {
 		case <-t.C:
-			p.publish()
+			// only publish if we're not using the service
+			if !p.opts.Service {
+				p.publish()
+			}
 		case <-r.C:
 			p.reap()
 		case <-p.exit:
@@ -202,6 +200,24 @@ func (p *platform) publish() error {
 		Timestamp: time.Now().Unix(),
 	}
 	return p.opts.Client.Publish(context.TODO(), a)
+}
+
+// immediately add self to ring
+func (p *platform) setup() {
+	for i := 0; i < 10; i++ {
+		// wait till there's a valid address from the server
+		if p := strings.Split(p.address(), ":"); len(p) < 2 {
+			time.Sleep(GossipEvent / 100.0)
+			continue
+		}
+		// have a valid address, setup, now
+		p.subscriber(context.Background(), &Announcement{
+			Namespace: p.opts.Namespace,
+			Address:   p.address(),
+			Timestamp: time.Now().Unix(),
+		})
+		return
+	}
 }
 
 func (p *platform) subscriber(ctx context.Context, a *Announcement) error {

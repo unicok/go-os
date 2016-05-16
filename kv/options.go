@@ -7,6 +7,8 @@ import (
 	"golang.org/x/net/context"
 )
 
+type serviceKey struct{}
+
 type Options struct {
 	// Servers that store values for access
 	Servers []string
@@ -18,6 +20,11 @@ type Options struct {
 	// Number of replicas
 	// Default is 1 ofcourse
 	Replicas int
+
+	// Use a service rather than gossip
+	Service bool
+	// Whether handlers should be internal
+	Internal bool
 
 	// Replace with go-micro.Service?
 	Client client.Client
@@ -48,5 +55,19 @@ func Client(c client.Client) Option {
 func Server(s server.Server) Option {
 	return func(o *Options) {
 		o.Server = s
+	}
+}
+
+// Internal specifies whether to use advertise handlers to discovery
+func Internal(b bool) Option {
+	return func(o *Options) {
+		o.Internal = b
+	}
+}
+
+// Service specifies whether to use the KV service. Defaults to false.
+func Service(b bool) Option {
+	return func(o *Options) {
+		o.Service = b
 	}
 }
