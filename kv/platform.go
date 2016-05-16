@@ -11,8 +11,8 @@ import (
 	"github.com/micro/go-micro/server"
 	proto "github.com/micro/go-platform/kv/proto"
 
+	"github.com/micro/consistent"
 	"golang.org/x/net/context"
-	"stathat.com/c/consistent"
 )
 
 /*
