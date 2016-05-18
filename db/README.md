@@ -1,6 +1,6 @@
-# DB - database interface
+# DB [![GoDoc](https://godoc.org/github.com/micro/go-platform?status.svg)](https://godoc.org/github.com/micro/go-platform/db)
 
-DB is a high level pluggable abstraction for databases. 
+DB is a high level pluggable abstraction for CRUD via RPC.
 
 The motivation is to create a DBaaS layer that 
 allows RPC based proxying so that we can leverage go-micro and all the plugins. This allows auth, 

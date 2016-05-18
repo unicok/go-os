@@ -1,6 +1,6 @@
-# Discovery - Discovery interface
+# Discovery [![GoDoc](https://godoc.org/github.com/micro/go-platform?status.svg)](https://godoc.org/github.com/micro/go-platform/discovery)
 
-Provides a high level pluggable abstraction for discovery.
+Provides a high level pluggable abstraction for service discovery.
 
 Building on ideas from [Eureka 2.0](https://github.com/Netflix/eureka/wiki/Eureka-2.0-Architecture-Overview)
 

@@ -1,4 +1,4 @@
-# Trace - Tracing interface
+# Trace [![GoDoc](https://godoc.org/github.com/micro/go-platform?status.svg)](https://godoc.org/github.com/micro/go-platform/trace)
 
 Provides a pluggable distributed tracing interface
 

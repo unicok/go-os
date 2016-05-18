@@ -1,4 +1,4 @@
-# Sync interface
+# Sync [![GoDoc](https://godoc.org/github.com/micro/go-platform?status.svg)](https://godoc.org/github.com/micro/go-platform/sync)
 
 Sync is client library for locking and leadership election. It provides a way to coordinate across a number of nodes. 
 It's a building block for synchronization in distributed systems.

@@ -1,4 +1,4 @@
-# KV - key value interface
+# KV [![GoDoc](https://godoc.org/github.com/micro/go-platform?status.svg)](https://godoc.org/github.com/micro/go-platform/kv)
  
 Provides a high level abstraction for key-value stores.
 

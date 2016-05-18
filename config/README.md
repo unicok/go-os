@@ -1,4 +1,4 @@
-# Config - Dynamic configuration
+# Config [![GoDoc](https://godoc.org/github.com/micro/go-platform?status.svg)](https://godoc.org/github.com/micro/go-platform/config)
 
 Provides a high level pluggable abstraction for dynamic configuration.
 

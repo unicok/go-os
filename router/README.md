@@ -1,4 +1,4 @@
-# Router interface
+# Router [![GoDoc](https://godoc.org/github.com/micro/go-platform?status.svg)](https://godoc.org/github.com/micro/go-platform/router)
 
 The router is a client library for global service load balancing. Go-micro uses client side load balancing 
 with the `Selector` interface but most implementation only provide a single view point of the environment, 

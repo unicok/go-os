@@ -1,6 +1,6 @@
-# Log - Logging interface
+# Log [![GoDoc](https://godoc.org/github.com/micro/go-platform?status.svg)](https://godoc.org/github.com/micro/go-platform/log)
  
-Provides a high level abstraction for centralised logging.
+Provides a high level abstraction for structured logging.
 
 ## Interface
 

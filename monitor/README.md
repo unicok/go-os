@@ -1,4 +1,4 @@
-# Monitor
+# Monitor [![GoDoc](https://godoc.org/github.com/micro/go-platform?status.svg)](https://godoc.org/github.com/micro/go-platform/monitor)
 
 Provides a high level pluggable abstraction for monitoring. 
 
