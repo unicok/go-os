@@ -68,7 +68,7 @@ written and rewritten in a microservice world is immense. By offloading this to 
 eliminate much of that and speed up development. The platform implementation includes pluggable backends such as mysql, 
 cassandra, elasticsearch and utilises the registry to lookup which nodes databases are assigned to. 
 
-This is purely experimental at this point based on some ideas from how Google, Facebook and Twitte do database management 
+This is purely experimental at this point based on some ideas from how Google, Facebook and Twitter do database management 
 internally.
  
 ### Discovery 
