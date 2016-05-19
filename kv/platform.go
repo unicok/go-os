@@ -10,6 +10,7 @@ import (
 	"github.com/micro/go-micro/client"
 	"github.com/micro/go-micro/server"
 	proto "github.com/micro/go-platform/kv/proto"
+	store "github.com/micro/kv-srv/proto/store"
 
 	"github.com/micro/consistent"
 	"golang.org/x/net/context"
@@ -27,6 +28,9 @@ type platform struct {
 	exit chan bool
 	hash *consistent.Consistent
 
+	// client
+	client store.StoreClient
+
 	sync.RWMutex
 	nodes map[string]int64
 }
@@ -40,7 +44,7 @@ type Announcement struct {
 
 var (
 	// not really needed but you know...
-	serviceName = "go.micro.kv"
+	serviceName = "go.micro.srv.kv"
 
 	GossipTopic = "go.micro.kv.announce"
 	GossipEvent = time.Second * 1
@@ -68,28 +72,33 @@ func newPlatform(opts ...Option) KV {
 	}
 
 	p := &platform{
-		exit:  make(chan bool),
-		opts:  options,
-		hash:  consistent.New(),
-		nodes: make(map[string]int64),
+		exit:   make(chan bool),
+		opts:   options,
+		hash:   consistent.New(),
+		nodes:  make(map[string]int64),
+		client: store.NewStoreClient(serviceName, options.Client),
 	}
 
-	options.Server.Subscribe(
-		options.Server.NewSubscriber(
-			GossipTopic,
-			p.subscriber,
-			server.InternalSubscriber(options.Internal),
-		),
-	)
+	// If using gossip then add the handlers and run the broadcaster
+	if !p.opts.Service {
+		options.Server.Subscribe(
+			options.Server.NewSubscriber(
+				GossipTopic,
+				p.subscriber,
+				server.InternalSubscriber(options.Internal),
+			),
+		)
 
-	options.Server.Handle(
-		options.Server.NewHandler(
-			&proto.KV{new(kv)},
-			server.InternalHandler(options.Internal),
-		),
-	)
+		options.Server.Handle(
+			options.Server.NewHandler(
+				&proto.KV{new(kv)},
+				server.InternalHandler(options.Internal),
+			),
+		)
 
-	go p.run()
+		go p.run()
+	}
+
 	return p
 }
 
@@ -167,22 +176,17 @@ func (p *platform) reap() {
 }
 
 func (p *platform) run() {
-	if !p.opts.Service {
-		p.setup()
-	}
-
 	// setup the ticker
 	t := time.NewTicker(GossipEvent)
 	r := time.NewTicker(ReaperEvent)
+
+	p.setup()
 
 	// now lets go!
 	for {
 		select {
 		case <-t.C:
-			// only publish if we're not using the service
-			if !p.opts.Service {
-				p.publish()
-			}
+			p.publish()
 		case <-r.C:
 			p.reap()
 		case <-p.exit:
@@ -250,6 +254,21 @@ func (p *platform) Close() error {
 }
 
 func (p *platform) Get(key string) (*Item, error) {
+	// if we're using the KV service then call that
+	if p.opts.Service {
+		rsp, err := p.client.Get(context.TODO(), &store.GetRequest{
+			Key: key,
+		})
+		if err != nil {
+			return nil, err
+		}
+		return &Item{
+			Key:        rsp.Item.Key,
+			Value:      rsp.Item.Value,
+			Expiration: time.Duration(rsp.Item.Expiration) * time.Second,
+		}, nil
+	}
+
 	nodes, err := p.hash.GetN(key, p.opts.Replicas)
 	if err != nil {
 		return nil, err
@@ -279,6 +298,14 @@ func (p *platform) Get(key string) (*Item, error) {
 }
 
 func (p *platform) Del(key string) error {
+	// if we're using the KV service then call that
+	if p.opts.Service {
+		_, err := p.client.Del(context.TODO(), &store.DelRequest{
+			Key: key,
+		})
+		return err
+	}
+
 	nodes, err := p.hash.GetN(key, p.opts.Replicas)
 	if err != nil {
 		return err
@@ -301,6 +328,18 @@ func (p *platform) Del(key string) error {
 }
 
 func (p *platform) Put(item *Item) error {
+	// if we're using the KV service then call that
+	if p.opts.Service {
+		_, err := p.client.Put(context.TODO(), &store.PutRequest{
+			Item: &store.Item{
+				Key:        item.Key,
+				Value:      item.Value,
+				Expiration: int64(item.Expiration.Seconds()),
+			},
+		})
+		return err
+	}
+
 	nodes, err := p.hash.GetN(item.Key, p.opts.Replicas)
 	if err != nil {
 		return err
