@@ -425,7 +425,16 @@ func (p *platform) GetService(name string) ([]*registry.Service, error) {
 
 	// disabled discovery?
 	if !p.opts.Discovery {
-		return p.opts.Registry.GetService(name)
+		services, err := p.opts.Registry.GetService(name)
+		if err != nil {
+			return nil, err
+		}
+
+		// cache on lookup
+		p.Lock()
+		p.cache[name] = services
+		p.Unlock()
+		return services, nil
 	}
 
 	rsp, err := p.reg.GetService(context.TODO(), &proto2.GetServiceRequest{Service: name})
@@ -437,10 +446,15 @@ func (p *platform) GetService(name string) ([]*registry.Service, error) {
 	for _, service := range rsp.Services {
 		services = append(services, toService(service))
 	}
+
+	// cache on lookup
+	p.Lock()
+	p.cache[name] = services
+	p.Unlock()
 	return services, nil
 }
 
-// TODO: prepoulate the cache
+// TODO: prepopulate the cache
 func (p *platform) ListServices() ([]*registry.Service, error) {
 	p.RLock()
 	if cache := p.cache; len(cache) > 0 {
