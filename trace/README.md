@@ -54,7 +54,7 @@ func NewTrace(opts ...Option) Trace {
 
 ## Supported
 
-- Trace service
+- [Trace service](https://github.com/micro/trace-srv)
 - Zipkin
 
 ## Usage

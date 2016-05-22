@@ -27,6 +27,7 @@ func NewKV(opts ...Option) KV {
 ## Supported Backends
 
 - Gossip
+- [KV Service](https://github.com/micro/kv-srv)
 - Memcached
 - Redis
 

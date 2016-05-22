@@ -59,7 +59,7 @@ func NewMonitor(opts ...Option) Monitor {
 
 ## Supported Backends
 
-- Monitor service
+- [Monitor service](https://github.com/micro/monitor-srv)
 
 ## Usage
 

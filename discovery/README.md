@@ -46,4 +46,4 @@ func NewDiscovery(opts ...Option) Discovery {
 ## Supported Backends
 
 - Micro registry (any plugins; consul, etcd, memory)
-- Discovery service
+- [Discovery service](https://github.com/micro/discovery-srv)

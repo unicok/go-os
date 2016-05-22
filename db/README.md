@@ -57,7 +57,7 @@ func NewRecord(id string, md Metadata, data interface{}) Record {
 
 ## Supported Backends
 
-- DB Service
+- [DB Service](https://github.com/micro/db-srv)
 
 ## Usage
 

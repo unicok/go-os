@@ -43,4 +43,4 @@ func NewRouter(opts ...selector.Option) Router {
 
 ## Supported Backends
 
-- Router service
+- [Router service](https://github.com/micro/router-srv)

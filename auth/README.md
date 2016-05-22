@@ -53,4 +53,4 @@ func NewAuth(opts ...Option) Auth {
 
 ## Supported Backends
 
-- Auth service (Oauth2)
+- [Auth service](https://github.com/micro/auth-srv) (Oauth2)

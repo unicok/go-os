@@ -34,4 +34,4 @@ func NewEvent(opts ...Option) Event {
 ```
 
 ## Supported Backends
-- Event service
+- [Event service](https://github.com/micro/event-srv)
