@@ -11,7 +11,7 @@ type Fields map[string]string
 
 // Metrics provides a way to instrument application data
 type Metrics interface {
-	Close() error
+        Close() error
         Init(...Option) error
         Counter(id string) Counter
         Gauge(id string) Gauge
