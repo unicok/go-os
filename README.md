@@ -1,7 +1,8 @@
 # Go Platform [![License](https://img.shields.io/:license-apache-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![GoDoc](https://godoc.org/github.com/micro/go-platform?status.svg)](https://godoc.org/github.com/micro/go-platform) [![Travis CI](https://travis-ci.org/micro/go-platform.svg?branch=master)](https://travis-ci.org/micro/go-platform) [![Go Report Card](https://goreportcard.com/badge/micro/go-platform)](https://goreportcard.com/report/github.com/micro/go-platform)
 
 The go-platform is a pluggable microservice platform library that builds on go-micro. It's goal is to address 
-the higher level requirements for microservices beyond the core fundamentals.
+the higher level requirements for microservices beyond the core fundamentals. These include; authentication, 
+dynamic configuration, distributed tracing, instrumentation, logging, monitoring, synchronisation and so on.
 
 ## What's it for?
 
