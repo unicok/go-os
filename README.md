@@ -1,16 +1,18 @@
 # Go Platform [![License](https://img.shields.io/:license-apache-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![GoDoc](https://godoc.org/github.com/micro/go-platform?status.svg)](https://godoc.org/github.com/micro/go-platform) [![Travis CI](https://travis-ci.org/micro/go-platform.svg?branch=master)](https://travis-ci.org/micro/go-platform) [![Go Report Card](https://goreportcard.com/badge/micro/go-platform)](https://goreportcard.com/report/github.com/micro/go-platform)
 
-Go-platform is a pluggable microservice platform library built to be used with micro/go-micro. 
-It provides all of the fundamental tooling required to run and manage a microservice environment. 
-It will be especially vital for anything above 20+ services and preferred by organisations. 
-Developers looking to write standalone services should continue to use go-micro. As mentioned 
-before, go-platform is pluggable so each backing component can be swapped out.
+The go-platform is a pluggable microservice platform library that builds on go-micro. It's goal is to address 
+the higher level requirements for microservices beyond the core fundamentals.
 
-Go platform builds on go-micro and uses either client/handler wrappers, before-after funcs or 
-other go-micro components. While each package can be used independently, it will be 
-much more powerful as a whole.
+## What's it for?
 
-Further community wide features should be contributed to [go-plugins](https://github.com/micro/go-plugins).
+At a certain a scale there's a need for systems that manage identity, configuration, observability, state, etc. 
+These are not core requirements for writing microservices but when you build a system with 20+ services or 
+are architecting a system for production use within an organisation it becomes a requirement for software 
+development and operational management.
+
+Just as with go-micro, the go-platform is pluggable and each package is backed by distributed systems which are 
+built for scale. Each package also works independently so you can choose what you want to use rather than 
+having to use everything. 
 
 Examples can be found in [go-platform/examples](https://github.com/micro/go-platform/tree/master/examples)
 
@@ -33,12 +35,6 @@ Package     |   Built-in Plugin	|	Description
 [sync](https://godoc.org/github.com/micro/go-platform/sync)	|	consul		|	distributed locking, leadership election, etc
 [trace](https://godoc.org/github.com/micro/go-platform/trace)	|	trace-srv	|	distributed tracing of request/response
 
-## What's it even good for?
-
-The Micro platform is useful for where you want to build a reliable globally distributed systems platform at scale. 
-You would be in good company by doing so, with the likes of Google, Facebook, Amazon, Twitter, Uber, Hailo, etc, etc.
-
-![Micro On-Demand](https://github.com/micro/micro/blob/master/doc/ondemand.png)
 
 ## How does it work?
 
@@ -132,3 +128,9 @@ way to regain some of these semantics.
 Trace is a client side interface for distributed tracing e.g dapper, zipkin, appdash. In a microservice world, a single 
 request may fan out to 20-30 services. Failure may be non deterministic and difficult to track. Distributed tracing is a 
 way of tracking the lifetime of a request. The interface utilises client and server wrappers to simplify using tracing.
+
+## Contributing
+
+We're looking for contributions so please join the [Slack](http://slack.micro.mu) to discuss or look at the open issues. 
+
+Further community wide plugins exist at [github.com/micro/go-plugins](https://github.com/micro/go-plugins).
