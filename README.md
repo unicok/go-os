@@ -61,16 +61,13 @@ multiple sources e.g file, url, config service. It can and should also be namesp
 config is loaded when running in dev, staging or production. The config interface is useful for business level 
 configuration required by your services. It can be reloaded without needing to restart a service.
 
-### DB (experimental) 
+### DB
 
 The DB interface is an experiment CRUD interface to simplify database access and management. The amount of CRUD boilerplate 
 written and rewritten in a microservice world is immense. By offloading this to a backend service and using RPC, we 
 eliminate much of that and speed up development. The platform implementation includes pluggable backends such as mysql, 
 cassandra, elasticsearch and utilises the registry to lookup which nodes databases are assigned to. 
 
-This is purely experimental at this point based on some ideas from how Google, Facebook and Twitter do database management 
-internally.
- 
 ### Discovery 
 
 Discovery provides a high level service discovery interface on top of the go-micro registry. It utilises the watcher to 
