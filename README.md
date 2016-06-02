@@ -25,8 +25,9 @@ services at [github.com/micro/platform](https://github.com/micro/platform).
 Each package can be used independently or integrated using go-micro client and handler wrappers.
 
 ## Features
-Each package provides a feature interface that will be pluggable and backed by a 
-number of services.
+Each package provides a feature interface that will be pluggable and backed by a number of services.
+
+Examples of usage can be found in [go-platform/examples](https://github.com/micro/go-platform/tree/master/examples)
 
 Package     |   Built-in Plugin	|	Description
 -------     |   --------	|	---------
@@ -42,8 +43,6 @@ Package     |   Built-in Plugin	|	Description
 [router](https://godoc.org/github.com/micro/go-platform/router)	|	router-srv	|	global circuit breaking, load balancing, A/B testing
 [sync](https://godoc.org/github.com/micro/go-platform/sync)	|	consul		|	distributed locking, leadership election, etc
 [trace](https://godoc.org/github.com/micro/go-platform/trace)	|	trace-srv	|	distributed tracing of request/response
-
-Examples of usage can be found in [go-platform/examples](https://github.com/micro/go-platform/tree/master/examples)
 
 ## Details
 
