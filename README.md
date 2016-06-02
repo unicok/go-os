@@ -41,7 +41,10 @@ Package     |   Built-in Plugin	|	Description
 
 The go-platform is a client side interface for the fundamentals of a microservice platform. Each package connects to 
 a service which handles that feature. Everything is an interface and pluggable which means you can choose how to 
-architect your platform. Micro however provides a "platform" implementation backed by it's own services by default.
+architect your platform.
+
+Micro provides a "platform" implementation backed by it's own services by default. You can find the platform 
+services at [github.com/micro/platform](https://github.com/micro/platform).
 
 Each package can be used independently or integrated using go-micro client and handler wrappers.
 
