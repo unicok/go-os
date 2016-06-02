@@ -15,7 +15,14 @@ Just as with go-micro, the go-platform is pluggable and each package is backed b
 built for scale. Each package also works independently so you can choose what you want to use rather than 
 having to use everything. 
 
-Examples can be found in [go-platform/examples](https://github.com/micro/go-platform/tree/master/examples)
+## How does it work?
+
+The go-platform is a client side interface for the fundamentals of a microservice platform. Each package connects to 
+a service which handles that feature. Everything is an interface and pluggable which means you can choose how to 
+architect your platform. Micro provides a "platform" implementation backed by it's own services by default. You can find the platform 
+services at [github.com/micro/platform](https://github.com/micro/platform).
+
+Each package can be used independently or integrated using go-micro client and handler wrappers.
 
 ## Features
 Each package provides a feature interface that will be pluggable and backed by a 
@@ -36,15 +43,11 @@ Package     |   Built-in Plugin	|	Description
 [sync](https://godoc.org/github.com/micro/go-platform/sync)	|	consul		|	distributed locking, leadership election, etc
 [trace](https://godoc.org/github.com/micro/go-platform/trace)	|	trace-srv	|	distributed tracing of request/response
 
+Examples of usage can be found in [go-platform/examples](https://github.com/micro/go-platform/tree/master/examples)
 
-## How does it work?
+## Details
 
-The go-platform is a client side interface for the fundamentals of a microservice platform. Each package connects to 
-a service which handles that feature. Everything is an interface and pluggable which means you can choose how to 
-architect your platform. Micro provides a "platform" implementation backed by it's own services by default. You can find the platform 
-services at [github.com/micro/platform](https://github.com/micro/platform).
-
-Each package can be used independently or integrated using go-micro client and handler wrappers.
+Here's some further details on each platform feature.
 
 ### Auth 
 
