@@ -72,7 +72,12 @@ func (w *watcher) Next() (*config.ChangeSet, error) {
 }
 
 func (w *watcher) Stop() error {
-	w.wp.Stop()
-	close(w.exit)
+	select {
+	case <-w.exit:
+		return nil
+	default:
+		w.wp.Stop()
+		close(w.exit)
+	}
 	return nil
 }
