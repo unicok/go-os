@@ -53,10 +53,21 @@ func NewSync(opts ...sync.Option) sync.Sync {
 		o(&options)
 	}
 
+	var endpoints []string
+
+	for _, addr := range options.Nodes {
+		if len(addr) > 0 {
+			endpoints = append(endpoints, addr)
+		}
+	}
+
+	if len(endpoints) == 0 {
+		endpoints = []string{"http://127.0.0.1:2379"}
+	}
+
 	// TODO: parse addresses
 	c, err := client.New(client.Config{
-		Endpoints: options.Nodes,
-		Transport: client.DefaultTransport,
+		Endpoints: endpoints,
 	})
 	if err != nil {
 		log.Fatal(err)

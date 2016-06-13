@@ -43,7 +43,6 @@ func (e *etcdLock) Acquire() error {
 	path := path.Join(e.path, strings.Replace(e.id, "/", "-", -1))
 
 	for {
-		// try set the lock
 		_, err := e.api.Set(ctx, path, e.node, opts)
 		if err == nil {
 			return nil
@@ -79,7 +78,7 @@ func (e *etcdLock) Acquire() error {
 				return err
 			}
 
-			if rsp.Action == "delete" || rsp.Action == "expire" {
+			if rsp.Action == "delete" || rsp.Action == "compareAndDelete" || rsp.Action == "expire" {
 				break
 			}
 		}
