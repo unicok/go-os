@@ -18,7 +18,7 @@ type etcd struct {
 }
 
 var (
-	DefaultPath = "/micro-config"
+	DefaultPath = "/micro/config"
 )
 
 func (e *etcd) Read() (*config.ChangeSet, error) {
