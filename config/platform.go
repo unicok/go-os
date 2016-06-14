@@ -121,10 +121,8 @@ func (p *platform) sync() {
 			// if we have no config, we're going to try
 			// load something
 			if vals == nil {
-				log.Printf("Failed to load a source %v but current config is empty so continuing", err)
 				continue
 			} else {
-				log.Printf("Failed to load a source %v backing off", err)
 				return
 			}
 		}
