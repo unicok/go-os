@@ -26,6 +26,10 @@ func (c *consul) Read() (*config.ChangeSet, error) {
 		return nil, err
 	}
 
+	if kv == nil {
+		return nil, fmt.Errorf("source not found: %s", c.opts.Name)
+	}
+
 	// hash the consul
 	h := md5.New()
 	h.Write(kv.Value)
