@@ -4,6 +4,8 @@ The go-platform is a pluggable microservice platform library that builds on go-m
 the higher level requirements for microservices beyond the core fundamentals. These include; authentication, 
 dynamic configuration, distributed tracing, instrumentation, logging, monitoring, synchronisation and so on.
 
+NOTE: This is still a work in progress. The interfaces may change or break.
+
 ## What's it for?
 
 At a certain a scale there's a need for systems that manage identity, configuration, observability, state, etc. 
