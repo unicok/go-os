@@ -22,7 +22,7 @@ Event sourcing can be tackled in a separate package.
 
 ```go
 type DB interface {
-	Close() error
+        Close() error
         Init(...Option) error
         Options() Options
         Read(id string) (Record, error)
@@ -47,12 +47,13 @@ type Record interface {
 }
 
 func NewDB(opts ...Option) DB {
-	return newPlatform(opts...)
+        return newPlatform(opts...)
 }
 
 func NewRecord(id string, md Metadata, data interface{}) Record {
-	return newRecord(id, md, data)
+        return newRecord(id, md, data)
 }
+
 ```
 
 ## Supported Backends
@@ -68,86 +69,85 @@ Doing this means go-micro/client wrappers can be used for rate limiting, auth, e
 package main
 
 import (
-	"fmt"
-
-	"github.com/micro/go-micro/cmd"
-	"github.com/micro/go-platform/db"
-	"github.com/pborman/uuid"
+        "fmt"
+        "github.com/micro/go-micro/cmd"
+        "github.com/micro/go-platform/db"
+        "github.com/pborman/uuid"
 )
 
 func main() {
-	// Create database instance
-	database := db.NewDB(
-		db.Database("foo"),
-		db.Table("bar"),
-	)
-
-	// Create Thing type
-	type Thing struct {
-		Name string
-	}
-
-	// Create a new record
-	record := db.NewRecord(
-		// record id
-		uuid.NewUUID().String(),
-		// record metadata
-		db.Metadata{"key": "value"},
-		// record value
-		&Thing{"dbthing"}),
-	)
-
-	fmt.Printf("Creating record: id: %s metadata: %+v bytes: %+v\n", record.Id(), record.Metadata(), string(record.Bytes()))
-
-	// Create the record
-	if err := database.Create(record); err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	// Read the record back
-	rec, err := database.Read(record.Id())
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	thing := new(Thing)
-
-	// Scan into type Thing
-	if err := rec.Scan(&thing); err != nil {
-		fmt.Println("Error scanning read record", err)
-		return
-	}
-
-	fmt.Printf("Read record: id: %s metadata: %+v bytes: %+v\n", rec.Id(), rec.Metadata(), thing)
-
-	fmt.Println("Searching for metadata key:value")
-
-	// Search using metadata
-	records, err := database.Search(db.Metadata{"key": "value"}, 10, 0)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	for _, record := range records {
-		thing := new(Thing)
-
-		if err := record.Scan(&thing); err != nil {
-			fmt.Println("Error scanning record", record.Id(), err)
-			return
-		}
-
-		fmt.Printf("Record: id: %s metadata: %+v bytes: %+v\n", record.Id(), record.Metadata(), thing)
-	}
-
-	fmt.Println("Deleting", record.Id())
-
-	// Delete the record
-	if err := database.Delete(record.Id()); err != nil {
-		fmt.Println(err)
-		return
-	}
+        // Create database instance
+        database := db.NewDB(
+                db.Database("foo"),
+                db.Table("bar"),
+        )
+        
+        // Create Thing type
+        type Thing struct {
+                Name string
+        }
+        
+        // Create a new record
+        record := db.NewRecord(
+                // record id
+                uuid.NewUUID().String(),
+                // record metadata
+                db.Metadata{"key": "value"},
+                // record value
+                &Thing{"dbthing"}),
+        )
+        
+        fmt.Printf("Creating record: id: %s metadata: %+v bytes: %+v\n", record.Id(), record.Metadata(), string(record.Bytes()))
+        
+        // Create the record
+        if err := database.Create(record); err != nil {
+                fmt.Println(err)
+                return
+        }
+        
+        // Read the record back
+        rec, err := database.Read(record.Id())
+        if err != nil {
+                fmt.Println(err)
+                return
+        }
+        
+        thing := new(Thing)
+        
+        // Scan into type Thing
+        if err := rec.Scan(&thing); err != nil {
+                fmt.Println("Error scanning read record", err)
+                return
+        }
+        
+        fmt.Printf("Read record: id: %s metadata: %+v bytes: %+v\n", rec.Id(), rec.Metadata(), thing)
+        
+        fmt.Println("Searching for metadata key:value")
+        
+        // Search using metadata
+        records, err := database.Search(db.Metadata{"key": "value"}, 10, 0)
+        if err != nil {
+                fmt.Println(err)
+                return
+        }
+        
+        for _, record := range records {
+                thing := new(Thing)
+        
+                if err := record.Scan(&thing); err != nil {
+                        fmt.Println("Error scanning record", record.Id(), err)
+                        return
+                }
+        
+                fmt.Printf("Record: id: %s metadata: %+v bytes: %+v\n", record.Id(), record.Metadata(), thing)
+        }
+        
+        fmt.Println("Deleting", record.Id())
+        
+        // Delete the record
+        if err := database.Delete(record.Id()); err != nil {
+                fmt.Println(err)
+                return
+        }
 }
 ```
