@@ -4,6 +4,8 @@ import (
 	"time"
 
 	"github.com/micro/go-micro/client"
+
+	"golang.org/x/net/context"
 )
 
 type Options struct {
@@ -20,6 +22,9 @@ type SourceOptions struct {
 	// Client for platform
 	Client client.Client
 	Hosts  []string
+
+	// Extra Options
+	Context context.Context
 }
 
 // PollInterval is the time interval at which the sources are polled
