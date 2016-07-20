@@ -152,10 +152,22 @@ func (p *platform) NewContext(ctx context.Context, t *Token) context.Context {
 }
 
 func (p *platform) FromHeader(hd map[string]string) (*Token, bool) {
-	t, ok := hd["authorization"]
+	var t string
+	var ok bool
+
+	// range possible auth headers
+	for _, key := range []string{"authorization", "Authorization"} {
+		t, ok = hd[key]
+		if ok {
+			break
+		}
+	}
+
+	// no token
 	if !ok {
 		return nil, false
 	}
+
 	parts := strings.Split(t, " ")
 	if len(parts) != 2 {
 		return nil, false
