@@ -20,21 +20,14 @@ func (c *clientWrapper) Call(ctx context.Context, req client.Request, rsp interf
 	var span *Span
 	var ok, okk bool
 	var err error
-	md := metadata.Metadata{}
+
+	md, mk := metadata.FromContext(ctx)
 
 	// try pull span from context
 	span, ok = c.t.FromContext(ctx)
 	if !ok {
-		// couldn't do that, try from the metadata
-
-		// So get trace info from metadata
-		var kk bool
-		md, kk = metadata.FromContext(ctx)
-		if !kk {
-			// couldn't do that either
-
-			// so this is a new span!
-			md = metadata.Metadata{}
+		if !mk {
+			// metadata is new, let's create a new span
 			span = c.t.NewSpan(nil)
 		} else {
 			// ok we got some md
