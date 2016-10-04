@@ -10,7 +10,7 @@ import (
 	"github.com/micro/go-micro/registry"
 	"github.com/micro/go-micro/server"
 
-	"github.com/micro/go-platform/trace"
+	"github.com/micro/go-os/trace"
 	"golang.org/x/net/context"
 )
 

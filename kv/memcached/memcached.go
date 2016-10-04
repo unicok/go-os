@@ -4,7 +4,7 @@ import (
 	"time"
 
 	mc "github.com/bradfitz/gomemcache/memcache"
-	"github.com/micro/go-platform/kv"
+	"github.com/micro/go-os/kv"
 )
 
 type mkv struct {

@@ -1,9 +1,9 @@
-# Monitor [![GoDoc](https://godoc.org/github.com/micro/go-platform?status.svg)](https://godoc.org/github.com/micro/go-platform/monitor)
+# Monitor [![GoDoc](https://godoc.org/github.com/micro/go-os?status.svg)](https://godoc.org/github.com/micro/go-os/monitor)
 
 Provides a high level pluggable abstraction for monitoring. 
 
 <p align="center">
-  <img src="https://github.com/micro/go-platform/blob/master/doc/monitor.png" />
+  <img src="https://github.com/micro/go-os/blob/master/doc/monitor.png" />
 </p>
 
 ## Interface
@@ -70,7 +70,7 @@ import (
 	"time"
 
 	"github.com/micro/go-micro"
-	"github.com/micro/go-platform/monitor"
+	"github.com/micro/go-os/monitor"
 )
 
 ...

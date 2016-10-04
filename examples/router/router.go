@@ -8,7 +8,7 @@ import (
 	"github.com/micro/go-micro/client"
 	"github.com/micro/go-micro/cmd"
 	"github.com/micro/go-micro/errors"
-	"github.com/micro/go-platform/router"
+	"github.com/micro/go-os/router"
 
 	proto "github.com/micro/router-srv/proto/router"
 )

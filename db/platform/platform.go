@@ -1,7 +1,7 @@
 package platform
 
 import (
-	"github.com/micro/go-platform/db"
+	"github.com/micro/go-os/db"
 )
 
 func NewDB(opts ...db.Option) db.DB {

@@ -1,7 +1,7 @@
 package platform
 
 import (
-	"github.com/micro/go-platform/discovery"
+	"github.com/micro/go-os/discovery"
 )
 
 func NewDiscovery(opts ...discovery.Option) discovery.Discovery {

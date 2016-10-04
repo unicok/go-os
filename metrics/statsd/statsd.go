@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/micro/go-platform/metrics"
+	"github.com/micro/go-os/metrics"
 )
 
 type statsd struct {

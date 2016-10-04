@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/micro/go-platform/config"
+	"github.com/micro/go-os/config"
 )
 
 func TestFile(t *testing.T) {

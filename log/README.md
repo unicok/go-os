@@ -1,4 +1,4 @@
-# Log [![GoDoc](https://godoc.org/github.com/micro/go-platform?status.svg)](https://godoc.org/github.com/micro/go-platform/log)
+# Log [![GoDoc](https://godoc.org/github.com/micro/go-os?status.svg)](https://godoc.org/github.com/micro/go-os/log)
  
 Provides a high level abstraction for structured logging.
 

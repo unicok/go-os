@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"github.com/hashicorp/consul/api"
-	sync "github.com/micro/go-platform/sync"
+	sync "github.com/micro/go-os/sync"
 )
 
 type consulLock struct {

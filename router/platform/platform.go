@@ -2,7 +2,7 @@ package platform
 
 import (
 	"github.com/micro/go-micro/selector"
-	"github.com/micro/go-platform/router"
+	"github.com/micro/go-os/router"
 )
 
 func NewRouter(opts ...selector.Option) router.Router {

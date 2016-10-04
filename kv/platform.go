@@ -9,7 +9,7 @@ import (
 
 	"github.com/micro/go-micro/client"
 	"github.com/micro/go-micro/server"
-	proto "github.com/micro/go-platform/kv/proto"
+	proto "github.com/micro/go-os/kv/proto"
 	store "github.com/micro/kv-srv/proto/store"
 
 	"github.com/micro/consistent"

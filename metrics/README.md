@@ -1,4 +1,4 @@
-# Metrics [![GoDoc](https://godoc.org/github.com/micro/go-platform?status.svg)](https://godoc.org/github.com/micro/go-platform/metrics)
+# Metrics [![GoDoc](https://godoc.org/github.com/micro/go-os?status.svg)](https://godoc.org/github.com/micro/go-os/metrics)
  
 Provides a high level abstraction to instrument metrics.
 

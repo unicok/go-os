@@ -1,7 +1,7 @@
 package platform
 
 import (
-	"github.com/micro/go-platform/auth"
+	"github.com/micro/go-os/auth"
 )
 
 func NewAuth(opts ...auth.Option) auth.Auth {

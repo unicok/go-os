@@ -5,7 +5,7 @@ import (
 
 	"github.com/micro/go-micro/errors"
 	"github.com/micro/go-micro/registry"
-	router "github.com/micro/go-platform/router/proto"
+	router "github.com/micro/go-os/router/proto"
 	"github.com/rcrowley/go-metrics"
 )
 

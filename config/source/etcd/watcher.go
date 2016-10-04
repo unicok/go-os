@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/coreos/etcd/client"
-	"github.com/micro/go-platform/config"
+	"github.com/micro/go-os/config"
 
 	"golang.org/x/net/context"
 )

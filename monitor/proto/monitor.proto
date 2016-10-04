@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package go.micro.platform.monitor;
+package go.micro.os.monitor;
 
 message Service {
 	string name = 1;

@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/micro/go-micro/cmd"
-	"github.com/micro/go-platform/monitor"
+	"github.com/micro/go-os/monitor"
 )
 
 type request struct {

@@ -1,7 +1,7 @@
 package telegraf
 
 import (
-	"github.com/micro/go-platform/metrics"
+	"github.com/micro/go-os/metrics"
 )
 
 // Telegraf is the same as the platform

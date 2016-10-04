@@ -1,7 +1,7 @@
-# Go Platform [![License](https://img.shields.io/:license-apache-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![GoDoc](https://godoc.org/github.com/micro/go-platform?status.svg)](https://godoc.org/github.com/micro/go-platform) [![Travis CI](https://api.travis-ci.org/micro/go-platform.svg?branch=master)](https://travis-ci.org/micro/go-platform) [![Go Report Card](https://goreportcard.com/badge/micro/go-platform)](https://goreportcard.com/report/github.com/micro/go-platform)
+# Go OS [![License](https://img.shields.io/:license-apache-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![GoDoc](https://godoc.org/github.com/micro/go-os?status.svg)](https://godoc.org/github.com/micro/go-os) [![Travis CI](https://api.travis-ci.org/micro/go-os.svg?branch=master)](https://travis-ci.org/micro/go-os) [![Go Report Card](https://goreportcard.com/badge/micro/go-os)](https://goreportcard.com/report/github.com/micro/go-os)
 
-The go-platform is a pluggable microservice platform library that builds on go-micro. It's goal is to address 
-the higher level requirements for microservices beyond the core fundamentals. These include; authentication, 
+Go-OS is a microservice operating system library which provides client side interfaces for [Micro OS](https://github.com/micro/os). It's primary function 
+is to address the higher level requirements for microservices not addressed by the Micro toolkit. These include; authentication, 
 dynamic configuration, distributed tracing, instrumentation, logging, monitoring, synchronisation and so on.
 
 NOTE: This is still a work in progress. The interfaces may change or break.
@@ -13,48 +13,48 @@ These are not core requirements for writing microservices but when you build a s
 are architecting a system for production use within an organisation it becomes a requirement for software 
 development and operational management.
 
-Just as with go-micro, the go-platform is pluggable and each package is backed by distributed systems which are 
+Just like go-micro, go-os is pluggable and each package is backed by distributed systems which are 
 built for scale. Each package also works independently so you can choose what you want to use rather than 
-having to use everything. 
+having to use everything.
 
 ## How does it work?
 
-The go-platform is a client side interface for the fundamentals of a microservice platform. Each package connects to 
-a service which handles that feature. Everything is an interface and pluggable which means you can choose how to 
-architect your platform. Micro provides a "platform" implementation backed by it's own services by default. You can find the platform 
-services at [github.com/micro/platform](https://github.com/micro/platform).
+Go-OS is a client side interface for the fundamentals of a microservice operating system. Each package connects to 
+a backend service which handles that feature. Everything is an interface and pluggable which means you can choose how to 
+architect your OS. Micro OS provides default implementations for everything. You can find the OS services at 
+[github.com/micro/os](https://github.com/micro/os).
 
 Each package can be used independently or integrated using go-micro client and handler wrappers.
 
 ## Features
 Each package provides a feature interface that will be pluggable and backed by a number of services.
 
-Examples of usage can be found in [go-platform/examples](https://github.com/micro/go-platform/tree/master/examples)
+Examples of usage can be found in [go-os/examples](https://github.com/micro/go-os/tree/master/examples)
 
 Package     |   Built-in Plugin	|	Description
 -------     |   --------	|	---------
-[auth](https://godoc.org/github.com/micro/go-platform/auth)	|	auth-srv	|   authentication and authorisation for users and services	
-[config](https://godoc.org/github.com/micro/go-platform/config)	|	config-srv	|   dynamic configuration which is namespaced and versioned
-[db](https://godoc.org/github.com/micro/go-platform/db)		|	db-srv		| distributed database abstraction
-[discovery](https://godoc.org/github.com/micro/go-platform/discovery)	|	discovery-srv	|   extends the go-micro registry to add heartbeating, etc
-[event](https://godoc.org/github.com/micro/go-platform/event)	|	event-srv	|	platform event publication, subscription and aggregation 
-[kv](https://godoc.org/github.com/micro/go-platform/kv)		|	distributed in-memory	|   simply key value layered on memcached, etcd, consul 
-[log](https://godoc.org/github.com/micro/go-platform/log)	|	file	|	structured logging to stdout, logstash, fluentd, pubsub
-[monitor](https://godoc.org/github.com/micro/go-platform/monitor)	|	monitor-srv	|   add custom healthchecks measured with distributed systems in mind
-[metrics](https://godoc.org/github.com/micro/go-platform/metrics)	|	telegraf	|   instrumentation and collation of counters
-[router](https://godoc.org/github.com/micro/go-platform/router)	|	router-srv	|	global circuit breaking, load balancing, A/B testing
-[sync](https://godoc.org/github.com/micro/go-platform/sync)	|	consul		|	distributed locking, leadership election, etc
-[trace](https://godoc.org/github.com/micro/go-platform/trace)	|	trace-srv	|	distributed tracing of request/response
+[auth](https://godoc.org/github.com/micro/go-os/auth)	|	auth-srv	|   authentication and authorisation for users and services	
+[config](https://godoc.org/github.com/micro/go-os/config)	|	config-srv	|   dynamic configuration which is namespaced and versioned
+[db](https://godoc.org/github.com/micro/go-os/db)		|	db-srv		| distributed database abstraction
+[discovery](https://godoc.org/github.com/micro/go-os/discovery)	|	discovery-srv	|   extends the go-micro registry to add heartbeating, etc
+[event](https://godoc.org/github.com/micro/go-os/event)	|	event-srv	|	event publication, subscription and aggregation 
+[kv](https://godoc.org/github.com/micro/go-os/kv)		|	distributed in-memory	|   simply key value layered on memcached, etcd, consul 
+[log](https://godoc.org/github.com/micro/go-os/log)	|	file	|	structured logging to stdout, logstash, fluentd, pubsub
+[monitor](https://godoc.org/github.com/micro/go-os/monitor)	|	monitor-srv	|   add custom healthchecks measured with distributed systems in mind
+[metrics](https://godoc.org/github.com/micro/go-os/metrics)	|	telegraf	|   instrumentation and collation of counters
+[router](https://godoc.org/github.com/micro/go-os/router)	|	router-srv	|	global circuit breaking, load balancing, A/B testing
+[sync](https://godoc.org/github.com/micro/go-os/sync)	|	consul		|	distributed locking, leadership election, etc
+[trace](https://godoc.org/github.com/micro/go-os/trace)	|	trace-srv	|	distributed tracing of request/response
 
 ## Details
 
-Here's some further details on each platform feature.
+Here's some further details on each OS feature.
 
 ### Auth 
 
 Auth addresses authentication and authorization of services and users. The default implementation is Oauth2 with an additional policy 
 engine coming soon. This is the best way to authenticate users and service to service calls using a centralised 
-authority. Security is a first class citizen in a microservice platform.
+authority. Security is a first class citizen in a microservice OS.
 
 ### Config 
 
@@ -67,7 +67,7 @@ configuration required by your services. It can be reloaded without needing to r
 
 The DB interface is an experiment CRUD interface to simplify database access and management. The amount of CRUD boilerplate 
 written and rewritten in a microservice world is immense. By offloading this to a backend service and using RPC, we 
-eliminate much of that and speed up development. The platform implementation includes pluggable backends such as mysql, 
+eliminate much of that and speed up development. The Micro OS implementation includes pluggable backends such as mysql, 
 cassandra, elasticsearch and utilises the registry to lookup which nodes databases are assigned to. 
 
 ### Discovery 
@@ -78,7 +78,7 @@ architecture whereby we split the read and write layers of discovery into separa
 
 ### Event
 
-The event package provides a way to send platform events and essentially create an event stream and record of all that's 
+The event package provides a way to send events and essentially create an event stream and record of all that's 
 happening in your microservice environment. On the backend an event service aggregates the records and allows you to 
 subscribe to a specific set of events. An event driven architecture is a powerful concept in a microservice environment 
 and must be addressed adequately. At scale it's essential for correlating events within a distributed system e.g 

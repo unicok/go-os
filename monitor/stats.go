@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/micro/go-micro/errors"
-	proto "github.com/micro/go-platform/monitor/proto"
+	proto "github.com/micro/go-os/monitor/proto"
 	"github.com/rcrowley/go-metrics"
 )
 

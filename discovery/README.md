@@ -1,4 +1,4 @@
-# Discovery [![GoDoc](https://godoc.org/github.com/micro/go-platform?status.svg)](https://godoc.org/github.com/micro/go-platform/discovery)
+# Discovery [![GoDoc](https://godoc.org/github.com/micro/go-os?status.svg)](https://godoc.org/github.com/micro/go-os/discovery)
 
 Provides a high level pluggable abstraction for service discovery.
 

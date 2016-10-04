@@ -26,7 +26,7 @@ func Registry(r registry.Registry) Option {
 }
 
 // Service specifies whether to use the platform Discovery service.
-// Because go-platform/discovery can be used as just a read layer cache
+// Because go-os/discovery can be used as just a read layer cache
 // we can disable the discovery service itself. It's on by default.
 func Service(b bool) Option {
 	return func(o *Options) {

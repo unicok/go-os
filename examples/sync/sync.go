@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/micro/go-micro/registry"
-	"github.com/micro/go-platform/sync"
-	"github.com/micro/go-platform/sync/etcd"
+	"github.com/micro/go-os/sync"
+	"github.com/micro/go-os/sync/etcd"
 )
 
 func leaderStatus(i int, s sync.Leader, msg string) {

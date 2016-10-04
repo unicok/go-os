@@ -1,4 +1,4 @@
-# DB [![GoDoc](https://godoc.org/github.com/micro/go-platform?status.svg)](https://godoc.org/github.com/micro/go-platform/db)
+# DB [![GoDoc](https://godoc.org/github.com/micro/go-os?status.svg)](https://godoc.org/github.com/micro/go-os/db)
 
 DB is a high level pluggable abstraction for CRUD via RPC.
 
@@ -8,7 +8,7 @@ rate limiting, tracing and all the other things to be used. What we lose in data
 in not having to write CRUD a thousand times over.
 
 <p align="center">
-  <img src="https://github.com/micro/go-platform/blob/master/doc/db.png" />
+  <img src="https://github.com/micro/go-os/blob/master/doc/db.png" />
 </p>
 
 ## Interface
@@ -71,7 +71,7 @@ package main
 import (
         "fmt"
         "github.com/micro/go-micro/cmd"
-        "github.com/micro/go-platform/db"
+        "github.com/micro/go-os/db"
         "github.com/pborman/uuid"
 )
 

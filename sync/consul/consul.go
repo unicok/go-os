@@ -10,7 +10,7 @@ import (
 
 	"github.com/hashicorp/consul/api"
 	"github.com/micro/go-micro/registry"
-	sync "github.com/micro/go-platform/sync"
+	sync "github.com/micro/go-os/sync"
 )
 
 type consulSync struct {

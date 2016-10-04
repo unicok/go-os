@@ -6,7 +6,7 @@ import (
 
 	"github.com/micro/go-micro/client"
 	"github.com/micro/go-micro/registry"
-	proto "github.com/micro/go-platform/trace/proto"
+	proto "github.com/micro/go-os/trace/proto"
 
 	"github.com/pborman/uuid"
 	"golang.org/x/net/context"

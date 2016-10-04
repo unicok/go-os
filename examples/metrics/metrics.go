@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/micro/go-platform/metrics"
+	"github.com/micro/go-os/metrics"
 )
 
 func main() {

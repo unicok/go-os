@@ -6,8 +6,8 @@ import (
 	"github.com/micro/go-micro/cmd"
 	example "github.com/micro/go-micro/examples/server/proto/example"
 	"github.com/micro/go-micro/metadata"
-	"github.com/micro/go-platform/trace"
-	"github.com/micro/go-platform/trace/zipkin"
+	"github.com/micro/go-os/trace"
+	"github.com/micro/go-os/trace/zipkin"
 	"golang.org/x/net/context"
 	"time"
 )

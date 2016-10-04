@@ -1,7 +1,7 @@
 package platform
 
 import (
-	"github.com/micro/go-platform/metrics"
+	"github.com/micro/go-os/metrics"
 )
 
 func NewMetrics(opts ...metrics.Option) metrics.Metrics {

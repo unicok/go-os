@@ -1,4 +1,4 @@
-# Sync [![GoDoc](https://godoc.org/github.com/micro/go-platform?status.svg)](https://godoc.org/github.com/micro/go-platform/sync)
+# Sync [![GoDoc](https://godoc.org/github.com/micro/go-os?status.svg)](https://godoc.org/github.com/micro/go-os/sync)
 
 Sync is client library for locking and leadership election. It provides a way to coordinate across a number of nodes. 
 It's a building block for synchronization in distributed systems.
@@ -50,7 +50,7 @@ package main
 import (
         "fmt"
 
-        "github.com/micro/go-platform/sync/consul"
+        "github.com/micro/go-os/sync/consul"
 )
 
 func main() {

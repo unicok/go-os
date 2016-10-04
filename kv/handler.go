@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/micro/go-micro/errors"
-	proto "github.com/micro/go-platform/kv/proto"
+	proto "github.com/micro/go-os/kv/proto"
 
 	"golang.org/x/net/context"
 )

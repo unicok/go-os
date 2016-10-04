@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package go.micro.platform.router;
+package go.micro.os.router;
 
 message Stats {
 	// service for these stats match

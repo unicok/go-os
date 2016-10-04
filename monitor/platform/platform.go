@@ -1,7 +1,7 @@
 package platform
 
 import (
-	"github.com/micro/go-platform/monitor"
+	"github.com/micro/go-os/monitor"
 )
 
 func NewMonitor(opts ...monitor.Option) monitor.Monitor {

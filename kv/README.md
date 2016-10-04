@@ -1,4 +1,4 @@
-# KV [![GoDoc](https://godoc.org/github.com/micro/go-platform?status.svg)](https://godoc.org/github.com/micro/go-platform/kv)
+# KV [![GoDoc](https://godoc.org/github.com/micro/go-os?status.svg)](https://godoc.org/github.com/micro/go-os/kv)
  
 Provides a high level abstraction for key-value stores.
 
@@ -47,7 +47,7 @@ import (
         "time"
 
         "github.com/micro/go-micro"
-        "github.com/micro/go-platform/kv"
+        "github.com/micro/go-os/kv"
 )
 
 func main() {
