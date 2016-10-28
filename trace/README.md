@@ -55,7 +55,8 @@ func NewTrace(opts ...Option) Trace {
 ## Supported
 
 - [Trace service](https://github.com/micro/trace-srv)
-- Zipkin
+- [Zipkin](https://github.com/micro/go-plugins/tree/master/trace/zipkin)
+- [Open Tracing](https://github.com/micro/go-plugins/tree/master/wrapper/trace/opentracing)
 
 ## Usage
 
