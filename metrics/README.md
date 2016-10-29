@@ -51,4 +51,6 @@ type Histogram interface {
 
 ## Supported Backends
 
-- Telegraf/StatsD
+- [Telegraf](https://github.com/micro/go-plugins/tree/master/metrics/telegraf)
+- [StatsD](https://github.com/micro/go-plugins/tree/master/metrics/statsd)
+- [Prometheus](https://github.com/micro/go-plugins/tree/master/metrics/prometheus)

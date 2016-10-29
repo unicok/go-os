@@ -40,7 +40,8 @@ type Elected interface {
 
 ## Supported Backends
 
-- Consul
+- [Consul](https://github.com/micro/go-plugins/tree/master/sync/consul)
+- [Etcd](https://github.com/micro/go-plugins/tree/master/sync/etcd)
 
 ## Usage 
 

@@ -26,10 +26,10 @@ func NewKV(opts ...Option) KV {
 
 ## Supported Backends
 
-- Gossip
+- Broker
 - [KV Service](https://github.com/micro/kv-srv)
-- Memcached
-- Redis
+- [Memcached](https://github.com/micro/go-plugins/tree/master/kv/memcached)
+- [Redis](https://github.com/micro/go-plugins/tree/master/kv/redis)
 
 ## Usage
 
