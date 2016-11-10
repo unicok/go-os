@@ -10,6 +10,7 @@ const (
 	WarnLevel  Level = 2
 	ErrorLevel Level = 3
 	FatalLevel Level = 4
+	PanicLevel Level = 5
 )
 
 type Level int32
@@ -31,11 +32,13 @@ type Logger interface {
 	Info(args ...interface{})
 	Error(args ...interface{})
 	Fatal(args ...interface{})
+	Panic(args ...interface{})
 	// Formatted logger
 	Debugf(format string, args ...interface{})
 	Infof(format string, args ...interface{})
 	Errorf(format string, args ...interface{})
 	Fatalf(format string, args ...interface{})
+	Panicf(format string, args ...interface{})
 	// Specify your own levels
 	Log(l Level, args ...interface{})
 	Logf(l Level, format string, args ...interface{})

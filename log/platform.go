@@ -110,6 +110,10 @@ func (l *logger) Fatal(args ...interface{}) {
 	l.fn(FatalLevel, l.f, fmt.Sprint(args...))
 }
 
+func (l *logger) Panic(args ...interface{}) {
+	l.fn(PanicLevel, l.f, fmt.Sprint(args...))
+}
+
 func (l *logger) Debugf(format string, args ...interface{}) {
 	l.fn(DebugLevel, l.f, fmt.Sprintf(format, args...))
 }
@@ -124,6 +128,10 @@ func (l *logger) Errorf(format string, args ...interface{}) {
 
 func (l *logger) Fatalf(format string, args ...interface{}) {
 	l.fn(FatalLevel, l.f, fmt.Sprintf(format, args...))
+}
+
+func (l *logger) Panicf(format string, args ...interface{}) {
+	l.fn(PanicLevel, l.f, fmt.Sprintf(format, args...))
 }
 
 func (l *logger) Log(level Level, args ...interface{}) {
